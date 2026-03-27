@@ -46,8 +46,11 @@ function App() {
     <ErrorBoundary>
       <div className={styles.container}>
         <FloatProvider speed={values.speed}>
-          <FloatItem>
-            <h1 className={styles.bouncingText}>Colby Schulz</h1>
+          <FloatItem freezeOnHover>
+            <h1 className={styles.bouncingText}>Colby Schulz 1</h1>
+          </FloatItem>
+          <FloatItem freezeOnHover>
+            <h1 className={styles.bouncingText}>Colby Schulz 2</h1>
           </FloatItem>
         </FloatProvider>
       </div>
