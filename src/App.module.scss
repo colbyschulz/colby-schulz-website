@@ -1,0 +1,16 @@
+:global(body) {
+  font-family: 'Syne', sans-serif;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.name {
+  font-size: 3rem;
+  font-weight: 300;
+}
