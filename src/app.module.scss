@@ -9,14 +9,11 @@
   z-index: 1;
 }
 
-.name {
-  position: absolute;
-  top: 0;
-  left: 0;
+.bouncingText {
   font-size: 3rem;
   font-weight: 300;
   white-space: nowrap;
   margin: 0;
-  will-change: transform;
+  z-index: 1;
 }
 

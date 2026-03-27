@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { BouncingText } from './components/bouncing-text/bouncing-text';
+import { FloatProvider } from './components/float/float-provider';
+import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ControlPanel } from './components/control-panel/control-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
@@ -44,7 +45,11 @@ function App() {
   return (
     <ErrorBoundary>
       <div className={styles.container}>
-        <BouncingText text="Colby Schulz" speed={values.speed} />
+        <FloatProvider speed={values.speed}>
+          <FloatItem>
+            <h1 className={styles.bouncingText}>Colby Schulz</h1>
+          </FloatItem>
+        </FloatProvider>
       </div>
 
       <GrainOverlay opacity={values.grain} />
