@@ -4,6 +4,7 @@ import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ControlPanel } from './components/control-panel/control-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
+import { Chat } from './components/chat/chat';
 import type {
   Control,
   ControlValues,
@@ -36,30 +37,34 @@ const DEFAULT_VALUES: ControlValues = Object.fromEntries(
 );
 
 function App() {
-  const [values, setValues] = useState<ControlValues>(DEFAULT_VALUES);
+  const [controlValues, setControlValues] =
+    useState<ControlValues>(DEFAULT_VALUES);
 
   const handleChange = useCallback((key: string, value: number) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
+    setControlValues((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   return (
     <ErrorBoundary>
       <div className={styles.container}>
-        <FloatProvider speed={values.speed}>
+        <FloatProvider speed={controlValues.speed}>
           <FloatItem freezeOnHover>
             <h1 className={styles.bouncingText}>Colby Schulz 1</h1>
           </FloatItem>
           <FloatItem freezeOnHover>
             <h1 className={styles.bouncingText}>Colby Schulz 2</h1>
           </FloatItem>
+          <FloatItem freezeOnHover>
+            <Chat />
+          </FloatItem>
         </FloatProvider>
       </div>
 
-      <GrainOverlay opacity={values.grain} />
+      <GrainOverlay opacity={controlValues.grain} />
 
       <ControlPanel
         controls={CONTROLS}
-        values={values}
+        values={controlValues}
         onChange={handleChange}
       />
     </ErrorBoundary>

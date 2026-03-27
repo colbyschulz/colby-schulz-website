@@ -1,36 +1,64 @@
+import type { IncomingMessage, ServerResponse } from 'http';
 import Anthropic from '@anthropic-ai/sdk';
 import { corsHeaders } from './_utils/cors';
 import { getSystemPrompt } from './_utils/content-loader';
 import { isRateLimited } from './_utils/rate-limiter';
 import { validateMessages } from './_utils/validation';
 
-export default async function handler(req: Request): Promise<Response> {
-  const origin = req.headers.get('origin') ?? '';
+export default async function handler(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
+  const origin = (req.headers['origin'] as string) ?? '';
   const cors = corsHeaders(origin);
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: cors });
+    res.writeHead(204, cors);
+    res.end();
+    return;
   }
 
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405, headers: cors });
+    res.writeHead(405, cors);
+    res.end('Method not allowed');
+    return;
   }
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
+  const ip =
+    ((req.headers['x-forwarded-for'] as string) ?? '').split(',')[0].trim() ||
+    'unknown';
   if (isRateLimited(ip)) {
-    return new Response('Too many requests', { status: 429, headers: cors });
+    res.writeHead(429, cors);
+    res.end('Too many requests');
+    return;
   }
 
   let body: unknown;
   try {
-    body = await req.json();
+    body = await new Promise((resolve, reject) => {
+      let data = '';
+      req.setEncoding('utf-8');
+      req.on('data', (chunk) => (data += chunk));
+      req.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          reject(new Error('Invalid JSON'));
+        }
+      });
+      req.on('error', reject);
+    });
   } catch {
-    return new Response('Invalid JSON', { status: 400, headers: cors });
+    res.writeHead(400, cors);
+    res.end('Invalid JSON');
+    return;
   }
 
   const result = validateMessages(body);
   if (typeof result === 'string') {
-    return new Response(result, { status: 400, headers: cors });
+    res.writeHead(400, cors);
+    res.end(result);
+    return;
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -41,35 +69,27 @@ export default async function handler(req: Request): Promise<Response> {
     messages: result,
   });
 
-  const encoder = new TextEncoder();
-  const readable = new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const event of stream) {
-          if (
-            event.type === 'content_block_delta' &&
-            event.delta.type === 'text_delta'
-          ) {
-            controller.enqueue(encoder.encode(event.delta.text));
-          }
-        }
-      } catch (err) {
-        controller.error(err);
-        return;
-      }
-      controller.close();
-    },
-    cancel() {
-      stream.abort();
-    },
+  res.writeHead(200, {
+    ...cors,
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
   });
 
-  return new Response(readable, {
-    headers: {
-      ...cors,
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'X-Content-Type-Options': 'nosniff',
-    },
-  });
+  try {
+    for await (const event of stream) {
+      if (
+        event.type === 'content_block_delta' &&
+        event.delta.type === 'text_delta'
+      ) {
+        res.write(event.delta.text);
+      }
+    }
+  } catch (err) {
+    // Stream already started — can't change status code, just end
+    res.end();
+    throw err;
+  }
+
+  res.end();
 }
