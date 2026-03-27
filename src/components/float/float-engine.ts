@@ -78,6 +78,75 @@ export class FloatEngine {
     this.viewportHeight = height;
   }
 
+  private resolveItemCollisions(): void {
+    const items = Array.from(this.items.values());
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const a = items[i];
+        const b = items[j];
+
+        // AABB overlap check
+        const overlapX =
+          a.position.x < b.position.x + b.size.width &&
+          a.position.x + a.size.width > b.position.x;
+        const overlapY =
+          a.position.y < b.position.y + b.size.height &&
+          a.position.y + a.size.height > b.position.y;
+
+        if (!overlapX || !overlapY) continue;
+
+        // Calculate overlap depth on each axis
+        const overlapLeft = a.position.x + a.size.width - b.position.x;
+        const overlapRight = b.position.x + b.size.width - a.position.x;
+        const overlapTop = a.position.y + a.size.height - b.position.y;
+        const overlapBottom = b.position.y + b.size.height - a.position.y;
+
+        const minOverlapX = Math.min(overlapLeft, overlapRight);
+        const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+        // Resolve on axis of least penetration
+        if (minOverlapX < minOverlapY) {
+          if (!a.frozen) {
+            a.velocity.x *= -1;
+            a.direction.x *= -1;
+          }
+          if (!b.frozen) {
+            b.velocity.x *= -1;
+            b.direction.x *= -1;
+          }
+          // Separate items
+          const push = minOverlapX / 2;
+          if (!a.frozen && !b.frozen) {
+            a.position.x += overlapLeft < overlapRight ? -push : push;
+            b.position.x += overlapLeft < overlapRight ? push : -push;
+          } else if (!a.frozen) {
+            a.position.x += overlapLeft < overlapRight ? -minOverlapX : minOverlapX;
+          } else if (!b.frozen) {
+            b.position.x += overlapLeft < overlapRight ? minOverlapX : -minOverlapX;
+          }
+        } else {
+          if (!a.frozen) {
+            a.velocity.y *= -1;
+            a.direction.y *= -1;
+          }
+          if (!b.frozen) {
+            b.velocity.y *= -1;
+            b.direction.y *= -1;
+          }
+          const push = minOverlapY / 2;
+          if (!a.frozen && !b.frozen) {
+            a.position.y += overlapTop < overlapBottom ? -push : push;
+            b.position.y += overlapTop < overlapBottom ? push : -push;
+          } else if (!a.frozen) {
+            a.position.y += overlapTop < overlapBottom ? -minOverlapY : minOverlapY;
+          } else if (!b.frozen) {
+            b.position.y += overlapTop < overlapBottom ? minOverlapY : -minOverlapY;
+          }
+        }
+      }
+    }
+  }
+
   tick(): Map<string, Vec2> {
     // Move non-frozen items
     for (const item of this.items.values()) {
@@ -106,6 +175,9 @@ export class FloatEngine {
         item.position.y = Math.max(0, Math.min(item.position.y, maxY));
       }
     }
+
+    // Item-item collisions
+    this.resolveItemCollisions();
 
     // Return positions
     const positions = new Map<string, Vec2>();

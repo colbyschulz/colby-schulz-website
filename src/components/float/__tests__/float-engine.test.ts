@@ -41,6 +41,51 @@ describe('FloatEngine', () => {
     });
   });
 
+  describe('item-item collision', () => {
+    it('reverses velocity when two items overlap', () => {
+      const engine = new FloatEngine(2, 800, 600);
+      // Place two items overlapping horizontally
+      engine.register('a', { width: 100, height: 50 }, { x: 100, y: 100 });
+      engine.register('b', { width: 100, height: 50 }, { x: 190, y: 100 });
+
+      const a = engine.getItem('a')!;
+      const b = engine.getItem('b')!;
+      // a moving right, b moving left — they will collide
+      a.velocity = { x: 2, y: 0 };
+      a.direction = { x: 1, y: 1 };
+      b.velocity = { x: -2, y: 0 };
+      b.direction = { x: -1, y: 1 };
+
+      engine.tick();
+
+      // After collision on x-axis, x velocities should reverse
+      expect(a.velocity.x).toBeLessThan(0);
+      expect(b.velocity.x).toBeGreaterThan(0);
+    });
+
+    it('bounces a moving item off a frozen item', () => {
+      const engine = new FloatEngine(2, 800, 600);
+      engine.register('a', { width: 100, height: 50 }, { x: 100, y: 100 });
+      engine.register('b', { width: 100, height: 50 }, { x: 190, y: 100 });
+
+      const a = engine.getItem('a')!;
+      a.velocity = { x: 2, y: 0 };
+      a.direction = { x: 1, y: 1 };
+
+      engine.setFrozen('b', true);
+      const bPosBefore = { ...engine.getItem('b')!.position };
+
+      engine.tick();
+
+      // a should bounce
+      expect(a.velocity.x).toBeLessThan(0);
+      // b should not have moved
+      const bPosAfter = engine.getItem('b')!.position;
+      expect(bPosAfter.x).toBe(bPosBefore.x);
+      expect(bPosAfter.y).toBe(bPosBefore.y);
+    });
+  });
+
   describe('edge collision', () => {
     it('reverses x velocity when hitting the right edge', () => {
       const engine = new FloatEngine(2, 800, 600);
