@@ -1,0 +1,21 @@
+:global(body) {
+  font-family: 'Syne', sans-serif;
+}
+
+.container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 3rem;
+  font-weight: 300;
+  white-space: nowrap;
+  margin: 0;
+  will-change: transform;
+}
+

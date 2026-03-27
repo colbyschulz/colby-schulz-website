@@ -1,12 +1,25 @@
 import { useEffect, useRef } from 'react';
-import styles from './App.module.scss';
+import styles from './bouncing-text.module.scss';
 
-const SPEED = 2;
+interface BouncingTextProps {
+  text: string;
+  speed?: number;
+}
 
-function App() {
+export function BouncingText({ text, speed = 2 }: BouncingTextProps) {
   const textRef = useRef<HTMLHeadingElement>(null);
   const posRef = useRef({ x: 100, y: 100 });
-  const velRef = useRef({ x: SPEED, y: SPEED });
+  const velRef = useRef({ x: speed, y: speed });
+  const dirRef = useRef({ x: 1, y: 1 }); // last known direction, preserved when speed hits 0
+
+  useEffect(() => {
+    if (speed === 0) {
+      velRef.current = { x: 0, y: 0 };
+    } else {
+      velRef.current = { x: dirRef.current.x * speed, y: dirRef.current.y * speed };
+    }
+  }, [speed]);
+
   useEffect(() => {
     let animId: number;
 
@@ -22,10 +35,12 @@ function App() {
 
       if (posRef.current.x <= 0 || posRef.current.x >= w) {
         velRef.current.x *= -1;
+        dirRef.current.x *= -1;
         posRef.current.x = Math.max(0, Math.min(posRef.current.x, w));
       }
       if (posRef.current.y <= 0 || posRef.current.y >= h) {
         velRef.current.y *= -1;
+        dirRef.current.y *= -1;
         posRef.current.y = Math.max(0, Math.min(posRef.current.y, h));
       }
 
@@ -38,10 +53,8 @@ function App() {
   }, []);
 
   return (
-    <div className={styles.container}>
-      <h1 ref={textRef} className={styles.name}>Colby Schulz</h1>
-    </div>
+    <h1 ref={textRef} className={styles.text}>
+      {text}
+    </h1>
   );
 }
-
-export default App;

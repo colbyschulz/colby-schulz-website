@@ -1,0 +1,125 @@
+.panel {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.toggle {
+  background: none;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  [data-open='true'] & {
+    opacity: 1;
+  }
+}
+
+.chevron {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  backdrop-filter: blur(12px);
+  min-width: 200px;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.controlHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  user-select: none;
+}
+
+.value {
+  font-size: 0.65rem;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.sliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  user-select: none;
+  touch-action: none;
+}
+
+.sliderTrack {
+  position: relative;
+  flex-grow: 1;
+  height: 2px;
+  background: rgba(128, 128, 128, 0.3);
+  border-radius: 1px;
+}
+
+.sliderRange {
+  position: absolute;
+  height: 100%;
+  background: rgba(128, 128, 128, 0.6);
+  border-radius: 1px;
+}
+
+.sliderThumb {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 50%;
+  cursor: grab;
+
+  &:hover {
+    background: #eee;
+  }
+
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}

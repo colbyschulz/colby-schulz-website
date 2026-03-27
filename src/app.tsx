@@ -1,0 +1,60 @@
+import { useCallback, useState } from 'react';
+import { BouncingText } from './components/bouncing-text/bouncing-text';
+import { GrainOverlay } from './components/grain-overlay/grain-overlay';
+import { ControlPanel } from './components/control-panel/control-panel';
+import type {
+  Control,
+  ControlValues,
+} from './components/control-panel/control-panel.types';
+import styles from './app.module.scss';
+
+const CONTROLS: Control[] = [
+  {
+    type: 'slider',
+    key: 'grain',
+    label: 'Grain',
+    min: 0,
+    max: 230,
+    step: 1,
+    defaultValue: 50,
+  },
+  {
+    type: 'slider',
+    key: 'speed',
+    label: 'Speed',
+    min: 0,
+    max: 20,
+    step: 0.5,
+    defaultValue: 2,
+  },
+];
+
+const DEFAULT_VALUES: ControlValues = Object.fromEntries(
+  CONTROLS.map((c) => [c.key, c.defaultValue]),
+);
+
+function App() {
+  const [values, setValues] = useState<ControlValues>(DEFAULT_VALUES);
+
+  const handleChange = useCallback((key: string, value: number) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  return (
+    <>
+      <div className={styles.container}>
+        <BouncingText text="Colby Schulz" speed={values.speed} />
+      </div>
+
+      <GrainOverlay opacity={values.grain} />
+
+      <ControlPanel
+        controls={CONTROLS}
+        values={values}
+        onChange={handleChange}
+      />
+    </>
+  );
+}
+
+export default App;
