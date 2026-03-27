@@ -1,0 +1,152 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  max-height: 500px;
+  font-family: inherit;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  scrollbar-width: thin;
+}
+
+.empty {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  text-align: center;
+  margin: auto;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: currentColor;
+  opacity: 0.7;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0; }
+}
+
+// ChatMessage
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.messageLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+.messageContent {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.messageUser {
+  align-items: flex-end;
+
+  .messageContent {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 12px 12px 2px 12px;
+  }
+}
+
+.messageAssistant {
+  align-items: flex-start;
+
+  .messageContent {
+    padding: 0;
+  }
+}
+
+// ChatInput
+
+.inputWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.textarea {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  resize: none;
+  outline: none;
+  field-sizing: content;
+  max-height: 120px;
+  overflow-y: auto;
+
+  &::placeholder {
+    opacity: 0.4;
+  }
+
+  &:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.submit {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}

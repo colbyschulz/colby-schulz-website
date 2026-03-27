@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { BouncingText } from './components/bouncing-text/bouncing-text';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ControlPanel } from './components/control-panel/control-panel';
+import { ErrorBoundary } from './components/error-boundary/error-boundary';
 import type {
   Control,
   ControlValues,
@@ -41,7 +42,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <ErrorBoundary>
       <div className={styles.container}>
         <BouncingText text="Colby Schulz" speed={values.speed} />
       </div>
@@ -53,7 +54,7 @@ function App() {
         values={values}
         onChange={handleChange}
       />
-    </>
+    </ErrorBoundary>
   );
 }
 

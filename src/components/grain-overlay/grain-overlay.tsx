@@ -5,6 +5,8 @@ interface GrainOverlayProps {
   opacity: number;
 }
 
+const FRAME_INTERVAL = 1000 / 24; // ~41.67ms — throttle to 24fps
+
 export function GrainOverlay({ opacity }: GrainOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const opacityRef = useRef(opacity);
@@ -21,8 +23,14 @@ export function GrainOverlay({ opacity }: GrainOverlayProps) {
     if (!ctx) return;
 
     let frame: number;
+    let lastTime = 0;
 
-    const draw = () => {
+    const draw = (time: number) => {
+      frame = requestAnimationFrame(draw);
+
+      if (time - lastTime < FRAME_INTERVAL) return;
+      lastTime = time;
+
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       const d = ctx.createImageData(canvas.width, canvas.height);
@@ -36,10 +44,9 @@ export function GrainOverlay({ opacity }: GrainOverlayProps) {
       }
 
       ctx.putImageData(d, 0, 0);
-      frame = requestAnimationFrame(draw);
     };
 
-    draw();
+    frame = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(frame);
   }, []);
 
