@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import Anthropic from '@anthropic-ai/sdk';
-import { corsHeaders } from './_utils/cors';
-import { getSystemPrompt } from './_utils/content-loader';
-import { isRateLimited } from './_utils/rate-limiter';
-import { validateMessages } from './_utils/validation';
+import { corsHeaders } from './_utils/cors.js';
+import { getSystemPrompt } from './_utils/content-loader.js';
+import { isRateLimited } from './_utils/rate-limiter.js';
+import { validateMessages } from './_utils/validation.js';
 
 export default async function handler(
   req: IncomingMessage,

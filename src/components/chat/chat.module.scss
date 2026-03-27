@@ -1,10 +1,8 @@
 .chat {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 600px;
-  height: 100%;
-  max-height: 500px;
+  width: min(600px, calc(100vw - 32px));
+  max-height: min(500px, calc(100dvh - 64px));
   font-family: inherit;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(16px);
@@ -110,7 +108,7 @@
   border-radius: 8px;
   color: inherit;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   padding: 8px 12px;
   resize: none;

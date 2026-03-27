@@ -49,10 +49,7 @@ function App() {
       <div className={styles.container}>
         <FloatProvider speed={controlValues.speed}>
           <FloatItem freezeOnHover>
-            <h1 className={styles.bouncingText}>Colby Schulz 1</h1>
-          </FloatItem>
-          <FloatItem freezeOnHover>
-            <h1 className={styles.bouncingText}>Colby Schulz 2</h1>
+            <h2 className={styles.bouncingText}>Colby Schulz 1</h2>
           </FloatItem>
           <FloatItem freezeOnHover>
             <Chat />
