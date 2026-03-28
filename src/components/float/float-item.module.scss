@@ -5,11 +5,15 @@
   will-change: transform;
 }
 
+.inner {
+  transition: transform 0.2s;
+}
+
 .clickable {
   cursor: pointer;
-  transition: filter 0.2s;
 
-  &:hover {
-    filter: drop-shadow(0 0 20px rgba(240, 192, 0, 0.4));
+  &:hover .inner {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
   }
 }

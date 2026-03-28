@@ -83,7 +83,7 @@ interface ActiveModal {
 }
 
 const ITEM_HEIGHT_ESTIMATE = 48; // ~3rem at 16px base
-const STACK_GAP = 16; // ~1rem
+const STACK_GAP = 40; // ~2.5rem
 
 function getStackPositions(count: number): Vec2[] {
   const totalHeight =

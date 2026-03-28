@@ -53,7 +53,7 @@ export function FloatItem({
       onMouseLeave={handleMouseLeave}
       onClick={onClick ? handleClick : undefined}
     >
-      {children}
+      <div className={styles.inner}>{children}</div>
     </div>
   );
 }
