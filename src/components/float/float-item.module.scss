@@ -7,4 +7,9 @@
 
 .clickable {
   cursor: pointer;
+  transition: filter 0.2s, transform 0.2s;
+
+  &:hover {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+  }
 }
