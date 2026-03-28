@@ -109,6 +109,8 @@ function App() {
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
   const [stackPositions] = useState(() => getStackPositions(FLOAT_ITEMS.length));
+  const chaosPanelTop =
+    stackPositions[FLOAT_ITEMS.length - 1].y + ITEM_HEIGHT_ESTIMATE + STACK_GAP;
   const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(null);
 
   const handleChange = useCallback((key: string, value: number) => {
@@ -183,6 +185,7 @@ function App() {
 
       <ChaosPanel
         chaosActive={chaosActive}
+        top={chaosPanelTop}
         controls={CONTROLS}
         values={controlValues}
         onChange={handleChange}

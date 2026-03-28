@@ -4,6 +4,7 @@ import styles from './chaos-panel.module.scss';
 
 interface ChaosPanelProps {
   chaosActive: boolean;
+  top: number;
   controls: Control[];
   values: ControlValues;
   onChange: (key: string, value: number) => void;
@@ -49,6 +50,7 @@ function SliderRow({
 
 export function ChaosPanel({
   chaosActive,
+  top,
   controls,
   values,
   onChange,
@@ -56,14 +58,14 @@ export function ChaosPanel({
   onCancelChaos,
 }: ChaosPanelProps) {
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ top }}>
       <div
         className={styles.box}
         data-chaos={chaosActive}
         onClick={!chaosActive ? onActivateChaos : undefined}
       >
-        <div className={styles.diamondFace}>
-          <span className={styles.diamondLabel}>activate chaos mode</span>
+        <div className={styles.calmFace}>
+          <span className={styles.calmLabel}>activate chaos mode</span>
         </div>
 
         <div className={styles.panelFace}>
