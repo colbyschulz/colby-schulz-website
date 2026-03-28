@@ -1,8 +1,10 @@
+@use '../../styles/tokens' as *;
+
 .panel {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  z-index: 10000;
+  z-index: $z-control-panel;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -11,14 +13,14 @@
 
 .toggle {
   background: none;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur($blur-glass);
   -webkit-tap-highlight-color: transparent;
-  border: 1px solid rgba(128, 128, 128, 0.3);
+  border: 1px solid $border-muted-strong;
   color: inherit;
-  font-family: inherit;
-  font-size: 0.7rem;
+  font-family: $font-base;
+  font-size: $text-sm;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: $tracking-ultra;
   padding: 0.5rem 1rem;
   cursor: pointer;
   opacity: 0.5;
@@ -47,8 +49,8 @@
   flex-direction: column;
   gap: 1.25rem;
   padding: 1.25rem;
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  backdrop-filter: blur(12px);
+  border: 1px solid $border-muted;
+  backdrop-filter: blur($blur-glass);
   min-width: 200px;
 }
 
@@ -65,15 +67,15 @@
 }
 
 .label {
-  font-size: 0.7rem;
+  font-size: $text-sm;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: $tracking-widest;
   opacity: 0.6;
   user-select: none;
 }
 
 .value {
-  font-size: 0.65rem;
+  font-size: $text-xs;
   opacity: 0.4;
   font-variant-numeric: tabular-nums;
 }
@@ -92,14 +94,14 @@
   position: relative;
   flex-grow: 1;
   height: 2px;
-  background: rgba(128, 128, 128, 0.3);
+  background: $border-muted-strong;
   border-radius: 1px;
 }
 
 .sliderRange {
   position: absolute;
   height: 100%;
-  background: rgba(128, 128, 128, 0.6);
+  background: rgba(128, 128, 128, 0.6); // intentional: one-off fill, distinct alpha from $border-muted-strong
   border-radius: 1px;
 }
 
@@ -107,17 +109,17 @@
   display: block;
   width: 12px;
   height: 12px;
-  background: white;
-  border: 1px solid rgba(128, 128, 128, 0.4);
+  background: $text-primary;
+  border: 1px solid $border-muted-strong;
   border-radius: 50%;
   cursor: grab;
 
   &:hover {
-    background: #eee;
+    background: #eee; // intentional: slightly darker than thumb on hover
   }
 
   &:focus-visible {
-    outline: 2px solid white;
+    outline: 2px solid $text-primary;
     outline-offset: 2px;
   }
 

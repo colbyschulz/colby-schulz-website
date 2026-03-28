@@ -1,6 +1,8 @@
+@use '../../styles/tokens' as *;
+
 .canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: $z-grain;
 }

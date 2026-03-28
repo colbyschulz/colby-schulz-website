@@ -1,0 +1,70 @@
+// ─── Z-Index ─────────────────────────────────────────────────────────────────
+// Sequential — position in list reflects stacking order.
+
+$z-grain: 0;
+$z-float: 1;
+$z-control-panel: 2;
+$z-modal-overlay: 3;
+$z-modal: 4;
+
+// ─── Surfaces ─────────────────────────────────────────────────────────────────
+
+$surface-glass: rgba(0, 0, 0, 0.5); // modal, chat panel background
+$surface-overlay: rgba(0, 0, 0, 0.2); // modal backdrop
+
+// ─── Borders ──────────────────────────────────────────────────────────────────
+
+$border-default: rgba(255, 255, 255, 0.3); // primary borders on glass elements
+$border-subtle: rgba(255, 255, 255, 0.1); // dividers inside glass elements
+$border-hover: rgba(255, 255, 255, 0.7); // border on hover
+$border-focus: rgba(255, 255, 255, 0.4); // border on focus
+$border-muted: rgba(128, 128, 128, 0.2); // control panel outer border
+$border-muted-strong: rgba(
+  128,
+  128,
+  128,
+  0.3
+); // control panel toggle/track/thumb
+
+// ─── Text ─────────────────────────────────────────────────────────────────────
+
+$text-primary: #fff;
+$text-muted: rgba(255, 255, 255, 0.55); // placeholder, empty state
+$text-disabled: rgba(255, 255, 255, 0.5); // reserved: disabled input text
+
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+
+$color-error: #ff6b6b;
+
+// ─── Scrollbar ────────────────────────────────────────────────────────────────
+
+$scrollbar-thumb: rgba(255, 255, 255, 0.2);
+
+// ─── Glow ─────────────────────────────────────────────────────────────────────
+
+$glow-default:
+  0 0 24px rgba(255, 255, 255, 0.12),
+  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+// ─── Blur ─────────────────────────────────────────────────────────────────────
+
+$blur-glass: 12px; // panel/overlay backdrop blur
+$blur-modal: 16px; // modal content backdrop blur
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+
+$font-base: 'Syne', sans-serif;
+
+$text-xs: 0.65rem; // control panel value readout
+$text-sm: 0.7rem; // labels, control panel
+$text-md: 0.875rem; // close button
+$text-base: 1rem; // reserved: base scale anchor
+$text-lg: 1.25rem; // modal title
+$text-xl: 3rem; // bouncing float labels
+
+$weight-light: 300;
+
+$tracking-wide: 0.05em; // close button
+$tracking-wider: 0.08em; // chat message labels
+$tracking-widest: 0.1em; // control labels
+$tracking-ultra: 0.15em; // control panel toggle
