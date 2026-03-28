@@ -2,7 +2,6 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import Anthropic from '@anthropic-ai/sdk';
 import { corsHeaders } from './_utils/cors.js';
 import { getSystemPrompt } from './_utils/content-loader.js';
-import { isRateLimited } from './_utils/rate-limiter.js';
 import { validateMessages } from './_utils/validation.js';
 
 export default async function handler(
@@ -21,15 +20,6 @@ export default async function handler(
   if (req.method !== 'POST') {
     res.writeHead(405, cors);
     res.end('Method not allowed');
-    return;
-  }
-
-  const ip =
-    ((req.headers['x-forwarded-for'] as string) ?? '').split(',')[0].trim() ||
-    'unknown';
-  if (isRateLimited(ip)) {
-    res.writeHead(429, cors);
-    res.end('Too many requests');
     return;
   }
 
