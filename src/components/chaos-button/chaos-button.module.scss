@@ -1,0 +1,45 @@
+@use '../../styles/tokens' as *;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.button {
+  // Diamond shape: rotated square
+  width: 120px;
+  height: 120px;
+  transform: rotate(45deg);
+  background: $color-caution;
+  border: 3px solid $color-caution-border;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: rotate(45deg) scale(1.05);
+    box-shadow: 0 0 20px rgba($color-caution, 0.4);
+  }
+
+  &:active {
+    transform: rotate(45deg) scale(0.97);
+  }
+}
+
+.label {
+  // Counter-rotate so text is readable
+  transform: rotate(-45deg);
+  font-family: $font-base;
+  font-size: $text-sm;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wide;
+  color: $color-caution-border;
+  line-height: 1.2;
+  text-align: center;
+  user-select: none;
+}
