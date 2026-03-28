@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { FloatProvider } from './components/float/float-provider';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FloatProvider, FloatContext } from './components/float/float-provider';
 import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ControlPanel } from './components/control-panel/control-panel';
@@ -13,6 +13,7 @@ import type {
   ControlValues,
 } from './components/control-panel/control-panel.types';
 import type { ComponentType } from 'react';
+import type { Vec2 } from './components/float/float-types';
 import styles from './app.module.scss';
 
 interface FloatItemConfig {
@@ -81,11 +82,34 @@ interface ActiveModal {
   origin: ModalOrigin;
 }
 
+const ITEM_HEIGHT_ESTIMATE = 48; // ~3rem at 16px base
+const STACK_GAP = 16; // ~1rem
+
+function getStackPositions(count: number): Vec2[] {
+  const totalHeight =
+    count * ITEM_HEIGHT_ESTIMATE + (count - 1) * STACK_GAP;
+  const startY = (window.innerHeight - totalHeight) / 2;
+  return Array.from({ length: count }, (_, i) => ({
+    x: window.innerWidth / 2 - 100,
+    y: startY + i * (ITEM_HEIGHT_ESTIMATE + STACK_GAP),
+  }));
+}
+
+function ReturnHomeBridge({ onCapture }: { onCapture: (fn: (onComplete?: () => void) => void) => void }) {
+  const { returnHome } = useContext(FloatContext);
+  useEffect(() => {
+    onCapture(returnHome);
+  }, [returnHome, onCapture]);
+  return null;
+}
+
 function App() {
   const [chaosActive, setChaosActive] = useState(false);
   const [controlValues, setControlValues] = useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
+  const [stackPositions] = useState(() => getStackPositions(FLOAT_ITEMS.length));
+  const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(null);
 
   const handleChange = useCallback((key: string, value: number) => {
     setControlValues((prev) => ({ ...prev, [key]: value }));
@@ -107,8 +131,14 @@ function App() {
   }, []);
 
   const handleCancelChaos = useCallback(() => {
-    setChaosActive(false);
-    setControlValues(CALM_VALUES);
+    returnHomeRef.current?.(() => {
+      setChaosActive(false);
+      setControlValues(CALM_VALUES);
+    });
+  }, []);
+
+  const captureReturnHome = useCallback((fn: (onComplete?: () => void) => void) => {
+    returnHomeRef.current = fn;
   }, []);
 
   const activeConfig = activeModal
@@ -117,52 +147,28 @@ function App() {
 
   return (
     <ErrorBoundary>
-      {chaosActive ? (
-        <div className={styles.container}>
-          <FloatProvider speed={controlValues.speed}>
-            {FLOAT_ITEMS.map((item) => (
-              <FloatItem
-                key={item.key}
-                freezeOnHover={item.freezeOnHover ?? false}
-                frozen={frozenKey === item.key}
-                onClick={
-                  item.modal
-                    ? (origin) => handleItemClick(item.key, origin)
-                    : undefined
-                }
-              >
-                <h2 className={styles.bouncingText}>{item.label}</h2>
-              </FloatItem>
-            ))}
-          </FloatProvider>
-        </div>
-      ) : (
-        <div className={styles.calmStack}>
-          {FLOAT_ITEMS.map((item) => (
-            <h2
+      <div className={styles.container}>
+        <FloatProvider speed={controlValues.speed}>
+          <ReturnHomeBridge onCapture={captureReturnHome} />
+          {FLOAT_ITEMS.map((item, i) => (
+            <FloatItem
               key={item.key}
-              className={styles.bouncingText}
+              initialPosition={stackPositions[i]}
+              freezeOnHover={chaosActive && (item.freezeOnHover ?? false)}
+              frozen={frozenKey === item.key}
               onClick={
                 item.modal
-                  ? () => {
-                      const el = document.querySelector(`[data-item="${item.key}"]`);
-                      const rect = el?.getBoundingClientRect();
-                      handleItemClick(item.key, {
-                        x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
-                        y: rect ? rect.top + rect.height / 2 : window.innerHeight / 2,
-                      });
-                    }
+                  ? (origin) => handleItemClick(item.key, origin)
                   : undefined
               }
-              data-item={item.key}
-              style={{ cursor: item.modal ? 'pointer' : undefined }}
             >
-              {item.label}
-            </h2>
+              <h2 className={styles.bouncingText}>{item.label}</h2>
+            </FloatItem>
           ))}
-          <ChaosButton onClick={handleActivateChaos} />
-        </div>
-      )}
+        </FloatProvider>
+      </div>
+
+      {!chaosActive && <ChaosButton onClick={handleActivateChaos} />}
 
       {activeModal && activeConfig?.modal && (
         <Modal
