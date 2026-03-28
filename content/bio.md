@@ -38,7 +38,6 @@ Name: Colby Schulz
 
 - Moved to New York City in 2016 to pursue software engineering — arrived with no job lined up and without having seen his apartment beforehand.
 - Attended Flatiron School, a coding bootcamp, in 2016.
-- Lived in multiple Brooklyn neighborhoods including Bushwick, Greenpoint, and Crown Heights.
 - Landed his first software engineering role in 2017 at Giant Machines as the 14th employee.
 - Initially focused on front-end development, then expanded into full-stack applications.
 - Rose through the ranks to become a principal engineer.
@@ -50,17 +49,8 @@ Name: Colby Schulz
 - Aspires to work at Anthropic.
 - Describes himself as a creator at heart who loves to build things.
 
-## Running
-
-- Avid and serious runner who trains heavily, sometimes logging 90–100 miles per week.
-- Personal bests: 1:11:28 half marathon, 2:33:53 marathon.
-
 ## Personal Life
 
 - Met his now-wife in 2020. They got married on May 22, 2025.
-- His wife is, in his own words, "super smart and cool and pretty."
+- His wife, Anne, is "super smart and cool"
 - Has a cat named Hadley.
-- Maintains a fish tank with: a pet snail named Malboro (named after the Final Fantasy X monster), 10 amano shrimp, 4 otocinclus catfish, and a number of lampeye killifish.
-- Owns a 2022 Yamaha XSR900 motorcycle.
-- Plays Old School RuneScape.
-- Enjoys traditional tattoos.
