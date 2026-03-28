@@ -17,3 +17,12 @@
   white-space: nowrap;
   margin: 0;
 }
+
+.calmStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  gap: 1rem;
+}

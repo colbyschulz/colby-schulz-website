@@ -6,6 +6,7 @@ import { ControlPanel } from './components/control-panel/control-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
 import { Chat } from './components/chat/chat';
 import { Modal } from './components/modal/modal';
+import { ChaosButton } from './components/chaos-button/chaos-button';
 import type { ModalOrigin } from './components/modal/modal.types';
 import type {
   Control,
@@ -72,9 +73,8 @@ const CONTROLS: Control[] = [
   },
 ];
 
-const DEFAULT_VALUES: ControlValues = Object.fromEntries(
-  CONTROLS.map((c) => [c.key, c.defaultValue]),
-);
+const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
+const CHAOS_VALUES: ControlValues = { grain: 60, speed: 2 };
 
 interface ActiveModal {
   key: string;
@@ -82,8 +82,8 @@ interface ActiveModal {
 }
 
 function App() {
-  const [controlValues, setControlValues] =
-    useState<ControlValues>(DEFAULT_VALUES);
+  const [chaosActive, setChaosActive] = useState(false);
+  const [controlValues, setControlValues] = useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
 
@@ -101,30 +101,68 @@ function App() {
     setActiveModal(null);
   }, []);
 
+  const handleActivateChaos = useCallback(() => {
+    setChaosActive(true);
+    setControlValues(CHAOS_VALUES);
+  }, []);
+
+  const handleCancelChaos = useCallback(() => {
+    setChaosActive(false);
+    setControlValues(CALM_VALUES);
+  }, []);
+
   const activeConfig = activeModal
     ? FLOAT_ITEMS.find((item) => item.key === activeModal.key)
     : null;
 
   return (
     <ErrorBoundary>
-      <div className={styles.container}>
-        <FloatProvider speed={controlValues.speed}>
+      {chaosActive ? (
+        <div className={styles.container}>
+          <FloatProvider speed={controlValues.speed}>
+            {FLOAT_ITEMS.map((item) => (
+              <FloatItem
+                key={item.key}
+                freezeOnHover={item.freezeOnHover ?? false}
+                frozen={frozenKey === item.key}
+                onClick={
+                  item.modal
+                    ? (origin) => handleItemClick(item.key, origin)
+                    : undefined
+                }
+              >
+                <h2 className={styles.bouncingText}>{item.label}</h2>
+              </FloatItem>
+            ))}
+          </FloatProvider>
+        </div>
+      ) : (
+        <div className={styles.calmStack}>
           {FLOAT_ITEMS.map((item) => (
-            <FloatItem
+            <h2
               key={item.key}
-              freezeOnHover={item.freezeOnHover ?? false}
-              frozen={frozenKey === item.key}
+              className={styles.bouncingText}
               onClick={
                 item.modal
-                  ? (origin) => handleItemClick(item.key, origin)
+                  ? () => {
+                      const el = document.querySelector(`[data-item="${item.key}"]`);
+                      const rect = el?.getBoundingClientRect();
+                      handleItemClick(item.key, {
+                        x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
+                        y: rect ? rect.top + rect.height / 2 : window.innerHeight / 2,
+                      });
+                    }
                   : undefined
               }
+              data-item={item.key}
+              style={{ cursor: item.modal ? 'pointer' : undefined }}
             >
-              <h2 className={styles.bouncingText}>{item.label}</h2>
-            </FloatItem>
+              {item.label}
+            </h2>
           ))}
-        </FloatProvider>
-      </div>
+          <ChaosButton onClick={handleActivateChaos} />
+        </div>
+      )}
 
       {activeModal && activeConfig?.modal && (
         <Modal
@@ -139,11 +177,14 @@ function App() {
 
       <GrainOverlay opacity={controlValues.grain} />
 
-      <ControlPanel
-        controls={CONTROLS}
-        values={controlValues}
-        onChange={handleChange}
-      />
+      {chaosActive && (
+        <ControlPanel
+          controls={CONTROLS}
+          values={controlValues}
+          onChange={handleChange}
+          onCancelChaos={handleCancelChaos}
+        />
+      )}
     </ErrorBoundary>
   );
 }
