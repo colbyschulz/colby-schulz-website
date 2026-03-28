@@ -4,15 +4,20 @@ import { ChatInput } from './chat-input';
 import styles from './chat.module.scss';
 
 export function Chat() {
-  const { messages, input, setInput, isLoading, error, sendMessage, messagesEndRef } =
-    useChat();
+  const {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    error,
+    sendMessage,
+    messagesEndRef,
+    inputRef,
+  } = useChat();
 
   return (
     <div className={styles.chat}>
       <div className={styles.messages}>
-        {messages.length === 0 && (
-          <ChatMessage role="assistant" content="Ask me anything about Colby." />
-        )}
         {messages.map((msg, i) => (
           <ChatMessage key={i} role={msg.role} content={msg.content} />
         ))}
@@ -25,6 +30,7 @@ export function Chat() {
           </p>
         )}
         <ChatInput
+          ref={inputRef}
           value={input}
           onChange={setInput}
           onSubmit={sendMessage}

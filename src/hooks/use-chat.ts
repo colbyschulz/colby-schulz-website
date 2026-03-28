@@ -5,16 +5,26 @@ export interface Message {
   content: string;
 }
 
+const INITIAL_MESSAGE: Message = {
+  role: 'assistant',
+  content: "Hey, I'm Colby's friend, James! Feel free to ask me anything about Colby.",
+};
+
 export function useChat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!isLoading) inputRef.current?.focus();
+  }, [isLoading]);
 
   async function sendMessage() {
     const text = input.trim();
@@ -36,7 +46,9 @@ export function useChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
+          messages: nextMessages
+            .slice(nextMessages.findIndex((m) => m.role === 'user'))
+            .map(({ role, content }) => ({ role, content })),
         }),
       });
 
@@ -76,5 +88,5 @@ export function useChat() {
     }
   }
 
-  return { messages, input, setInput, isLoading, error, sendMessage, messagesEndRef };
+  return { messages, input, setInput, isLoading, error, sendMessage, messagesEndRef, inputRef };
 }

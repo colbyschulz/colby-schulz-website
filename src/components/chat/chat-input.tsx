@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import styles from './chat.module.scss';
 
 interface ChatInputProps {
@@ -7,7 +8,8 @@ interface ChatInputProps {
   disabled: boolean;
 }
 
-export function ChatInput({ value, onChange, onSubmit, disabled }: ChatInputProps) {
+export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
+  function ChatInput({ value, onChange, onSubmit, disabled }, ref) {
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -20,6 +22,7 @@ export function ChatInput({ value, onChange, onSubmit, disabled }: ChatInputProp
       <span className={styles.messageLabel}>you</span>
       <div className={styles.inputBubble}>
         <textarea
+          ref={ref}
           className={styles.inputTextarea}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -40,4 +43,4 @@ export function ChatInput({ value, onChange, onSubmit, disabled }: ChatInputProp
       </div>
     </div>
   );
-}
+});

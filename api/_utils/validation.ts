@@ -26,9 +26,7 @@ export function validateMessages(
     messages.push({ role, content });
   }
 
-  if (messages.length === 0 || messages[0].role !== 'user') {
-    return 'No valid messages';
-  }
+  if (messages.length === 0) return 'No valid messages';
 
   return messages;
 }
