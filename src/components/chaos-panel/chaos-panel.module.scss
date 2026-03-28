@@ -1,14 +1,5 @@
 @use '../../styles/tokens' as *;
 
-.wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: $z-control-panel;
-  pointer-events: none;
-}
 
 .box {
   pointer-events: auto;

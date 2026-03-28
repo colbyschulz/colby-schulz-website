@@ -4,7 +4,6 @@ import styles from './chaos-panel.module.scss';
 
 interface ChaosPanelProps {
   chaosActive: boolean;
-  top: number;
   controls: Control[];
   values: ControlValues;
   onChange: (key: string, value: number) => void;
@@ -50,7 +49,6 @@ function SliderRow({
 
 export function ChaosPanel({
   chaosActive,
-  top,
   controls,
   values,
   onChange,
@@ -58,35 +56,33 @@ export function ChaosPanel({
   onCancelChaos,
 }: ChaosPanelProps) {
   return (
-    <div className={styles.wrapper} style={{ top }}>
-      <div
-        className={styles.box}
-        data-chaos={chaosActive}
-        onClick={!chaosActive ? onActivateChaos : undefined}
-      >
-        <div className={styles.calmFace}>
-          <span className={styles.calmLabel}>activate chaos mode</span>
-        </div>
+    <div
+      className={styles.box}
+      data-chaos={chaosActive}
+      onClick={!chaosActive ? onActivateChaos : undefined}
+    >
+      <div className={styles.calmFace}>
+        <span className={styles.calmLabel}>activate chaos mode</span>
+      </div>
 
-        <div className={styles.panelFace}>
-          <span className={styles.panelHeader}>Chaos Controller</span>
-          <div className={styles.controls}>
-            {controls.map((control) => {
-              if (control.type !== 'slider') return null;
-              return (
-                <SliderRow
-                  key={control.key}
-                  control={control}
-                  value={values[control.key]}
-                  onChange={(v) => onChange(control.key, v)}
-                />
-              );
-            })}
-          </div>
-          <button className={styles.cancelButton} onClick={onCancelChaos}>
-            Cancel Chaos
-          </button>
+      <div className={styles.panelFace}>
+        <span className={styles.panelHeader}>Chaos Controller</span>
+        <div className={styles.controls}>
+          {controls.map((control) => {
+            if (control.type !== 'slider') return null;
+            return (
+              <SliderRow
+                key={control.key}
+                control={control}
+                value={values[control.key]}
+                onChange={(v) => onChange(control.key, v)}
+              />
+            );
+          })}
         </div>
+        <button className={styles.cancelButton} onClick={onCancelChaos}>
+          Cancel Chaos
+        </button>
       </div>
     </div>
   );

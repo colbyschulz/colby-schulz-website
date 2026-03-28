@@ -74,7 +74,7 @@ const CONTROLS: Control[] = [
   },
 ];
 
-const CALM_VALUES: ControlValues = { grain: 50, speed: 0 };
+const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
 const CHAOS_VALUES: ControlValues = { grain: 60, speed: 2 };
 
 interface ActiveModal {
@@ -86,8 +86,7 @@ const ITEM_HEIGHT_ESTIMATE = 48; // ~3rem at 16px base
 const STACK_GAP = 40; // ~2.5rem
 
 function getStackPositions(count: number): Vec2[] {
-  const totalHeight =
-    count * ITEM_HEIGHT_ESTIMATE + (count - 1) * STACK_GAP;
+  const totalHeight = count * ITEM_HEIGHT_ESTIMATE + (count - 1) * STACK_GAP;
   const startY = (window.innerHeight - totalHeight) / 2;
   return Array.from({ length: count }, (_, i) => ({
     x: window.innerWidth / 2 - 100,
@@ -95,7 +94,11 @@ function getStackPositions(count: number): Vec2[] {
   }));
 }
 
-function ReturnHomeBridge({ onCapture }: { onCapture: (fn: (onComplete?: () => void) => void) => void }) {
+function ReturnHomeBridge({
+  onCapture,
+}: {
+  onCapture: (fn: (onComplete?: () => void) => void) => void;
+}) {
   const { returnHome } = useContext(FloatContext);
   useEffect(() => {
     onCapture(returnHome);
@@ -105,13 +108,23 @@ function ReturnHomeBridge({ onCapture }: { onCapture: (fn: (onComplete?: () => v
 
 function App() {
   const [chaosActive, setChaosActive] = useState(false);
-  const [controlValues, setControlValues] = useState<ControlValues>(CALM_VALUES);
+  const [controlValues, setControlValues] =
+    useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
-  const [stackPositions] = useState(() => getStackPositions(FLOAT_ITEMS.length));
-  const chaosPanelTop =
-    stackPositions[FLOAT_ITEMS.length - 1].y + ITEM_HEIGHT_ESTIMATE + STACK_GAP;
-  const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(null);
+  const [{ stackPositions, chaosPanelPosition }] = useState(() => {
+    const positions = getStackPositions(FLOAT_ITEMS.length);
+    return {
+      stackPositions: positions,
+      chaosPanelPosition: {
+        x: window.innerWidth / 2 - 110, // centers the 220px panel
+        y: positions[FLOAT_ITEMS.length - 1].y + ITEM_HEIGHT_ESTIMATE + STACK_GAP,
+      },
+    };
+  });
+  const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(
+    null,
+  );
 
   const handleChange = useCallback((key: string, value: number) => {
     setControlValues((prev) => ({ ...prev, [key]: value }));
@@ -139,9 +152,12 @@ function App() {
     });
   }, []);
 
-  const captureReturnHome = useCallback((fn: (onComplete?: () => void) => void) => {
-    returnHomeRef.current = fn;
-  }, []);
+  const captureReturnHome = useCallback(
+    (fn: (onComplete?: () => void) => void) => {
+      returnHomeRef.current = fn;
+    },
+    [],
+  );
 
   const activeConfig = activeModal
     ? FLOAT_ITEMS.find((item) => item.key === activeModal.key)
@@ -167,6 +183,20 @@ function App() {
               <h2 className={styles.bouncingText}>{item.label}</h2>
             </FloatItem>
           ))}
+          <FloatItem
+            initialPosition={chaosPanelPosition}
+            frozen={true}
+            freezeOnHover={false}
+          >
+            <ChaosPanel
+              chaosActive={chaosActive}
+              controls={CONTROLS}
+              values={controlValues}
+              onChange={handleChange}
+              onActivateChaos={handleActivateChaos}
+              onCancelChaos={handleCancelChaos}
+            />
+          </FloatItem>
         </FloatProvider>
       </div>
 
@@ -182,16 +212,6 @@ function App() {
       )}
 
       <GrainOverlay opacity={controlValues.grain} />
-
-      <ChaosPanel
-        chaosActive={chaosActive}
-        top={chaosPanelTop}
-        controls={CONTROLS}
-        values={controlValues}
-        onChange={handleChange}
-        onActivateChaos={handleActivateChaos}
-        onCancelChaos={handleCancelChaos}
-      />
     </ErrorBoundary>
   );
 }
