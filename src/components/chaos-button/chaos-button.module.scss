@@ -1,9 +1,13 @@
 @use '../../styles/tokens' as *;
 
 .wrapper {
+  position: fixed;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+  z-index: $z-control-panel;
 }
 
 .button {
