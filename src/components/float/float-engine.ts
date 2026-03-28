@@ -5,6 +5,8 @@ export class FloatEngine {
   private speed: number;
   private viewportWidth: number;
   private viewportHeight: number;
+  private returning = false;
+  private onReturnComplete: (() => void) | null = null;
 
   constructor(speed: number, viewportWidth: number, viewportHeight: number) {
     this.speed = speed;
@@ -29,12 +31,13 @@ export class FloatEngine {
 
     this.items.set(id, {
       id,
-      position,
+      position: { ...position },
       velocity: { x: dirX * this.speed, y: dirY * this.speed },
       direction: { x: dirX, y: dirY },
       size,
       frozen: false,
       element,
+      homePosition: { ...position },
     });
   }
 
@@ -76,6 +79,15 @@ export class FloatEngine {
   setViewport(width: number, height: number): void {
     this.viewportWidth = width;
     this.viewportHeight = height;
+  }
+
+  returnHome(onComplete?: () => void): void {
+    this.returning = true;
+    this.onReturnComplete = onComplete ?? null;
+  }
+
+  isReturning(): boolean {
+    return this.returning;
   }
 
   private resolveItemCollisions(): void {
@@ -147,7 +159,49 @@ export class FloatEngine {
     }
   }
 
+  private tickReturnHome(): Map<string, Vec2> {
+    let allHome = true;
+    const lerpFactor = 0.08;
+    const snapThreshold = 0.5;
+
+    for (const item of this.items.values()) {
+      const dx = item.homePosition.x - item.position.x;
+      const dy = item.homePosition.y - item.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < snapThreshold) {
+        item.position.x = item.homePosition.x;
+        item.position.y = item.homePosition.y;
+        item.velocity = { x: 0, y: 0 };
+      } else {
+        allHome = false;
+        item.position.x += dx * lerpFactor;
+        item.position.y += dy * lerpFactor;
+      }
+    }
+
+    if (allHome) {
+      this.returning = false;
+      this.speed = 0;
+      for (const item of this.items.values()) {
+        item.velocity = { x: 0, y: 0 };
+      }
+      this.onReturnComplete?.();
+      this.onReturnComplete = null;
+    }
+
+    const positions = new Map<string, Vec2>();
+    for (const item of this.items.values()) {
+      positions.set(item.id, { x: item.position.x, y: item.position.y });
+    }
+    return positions;
+  }
+
   tick(): Map<string, Vec2> {
+    if (this.returning) {
+      return this.tickReturnHome();
+    }
+
     // Move non-frozen items
     for (const item of this.items.values()) {
       if (item.frozen) continue;

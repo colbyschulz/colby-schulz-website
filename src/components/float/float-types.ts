@@ -18,6 +18,7 @@ export interface FloatingItem {
   size: Size;
   frozen: boolean;
   element: HTMLElement | null;
+  homePosition: Vec2;
 }
 
 export interface FloatContextValue {
