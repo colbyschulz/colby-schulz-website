@@ -18,6 +18,7 @@ export default async function handler(
   }
 
   if (req.method !== 'POST') {
+    console.error('[chat] Method not allowed:', req.method);
     res.writeHead(405, cors);
     res.end('Method not allowed');
     return;
@@ -38,7 +39,8 @@ export default async function handler(
       });
       req.on('error', reject);
     });
-  } catch {
+  } catch (err) {
+    console.error('[chat] Failed to parse request body:', err);
     res.writeHead(400, cors);
     res.end('Invalid JSON');
     return;
@@ -46,18 +48,28 @@ export default async function handler(
 
   const result = validateMessages(body);
   if (typeof result === 'string') {
+    console.error('[chat] Message validation failed:', result);
     res.writeHead(400, cors);
     res.end(result);
     return;
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const stream = client.messages.stream({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    system: getSystemPrompt(),
-    messages: result,
-  });
+
+  let stream;
+  try {
+    stream = client.messages.stream({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: getSystemPrompt(),
+      messages: result,
+    });
+  } catch (err) {
+    console.error('[chat] Failed to initiate Anthropic stream:', err);
+    res.writeHead(500, cors);
+    res.end('Failed to start stream');
+    return;
+  }
 
   res.writeHead(200, {
     ...cors,
@@ -76,9 +88,15 @@ export default async function handler(
       }
     }
   } catch (err) {
-    // Stream already started — can't change status code, just end
+    const isApiError = err instanceof Anthropic.APIError;
+    console.error('[chat] Stream error:', {
+      message: isApiError ? err.message : String(err),
+      status: isApiError ? err.status : undefined,
+      type: isApiError ? err.error : undefined,
+    });
+    // Headers already sent — can't change status code, just end
     res.end();
-    throw err;
+    return;
   }
 
   res.end();

@@ -41,14 +41,11 @@ export function useChat() {
       });
 
       if (!res.ok) {
-        const msg =
-          res.status === 429
-            ? 'Too many requests — try again later.'
-            : res.status === 400
-              ? 'Invalid request.'
-              : 'Something went wrong.';
+        const body = await res.text().catch(() => '');
+        const detail = body.trim() || res.statusText || 'Unknown error';
+        console.error('[chat] Request failed:', { status: res.status, detail });
         setMessages((prev) => prev.slice(0, -1));
-        setError(msg);
+        setError(`Error ${res.status}: ${detail}`);
         return;
       }
 
@@ -69,9 +66,11 @@ export function useChat() {
           return updated;
         });
       }
-    } catch {
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error('[chat] Unexpected error:', detail);
       setMessages((prev) => prev.slice(0, -1));
-      setError('Network error — check your connection.');
+      setError(`Network error: ${detail}`);
     } finally {
       setIsLoading(false);
     }
