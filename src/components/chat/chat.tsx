@@ -11,7 +11,7 @@ export function Chat() {
     <div className={styles.chat}>
       <div className={styles.messages}>
         {messages.length === 0 && (
-          <p className={styles.empty}>Ask me anything about Colby.</p>
+          <ChatMessage role="assistant" content="Ask me anything about Colby." />
         )}
         {messages.map((msg, i) => (
           <ChatMessage key={i} role={msg.role} content={msg.content} />
@@ -24,15 +24,14 @@ export function Chat() {
             {error}
           </p>
         )}
+        <ChatInput
+          value={input}
+          onChange={setInput}
+          onSubmit={sendMessage}
+          disabled={isLoading}
+        />
         <div ref={messagesEndRef} />
       </div>
-
-      <ChatInput
-        value={input}
-        onChange={setInput}
-        onSubmit={sendMessage}
-        disabled={isLoading}
-      />
     </div>
   );
 }

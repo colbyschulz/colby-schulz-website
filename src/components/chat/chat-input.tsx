@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import styles from './chat.module.scss';
 
 interface ChatInputProps {
@@ -9,8 +8,6 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ value, onChange, onSubmit, disabled }: ChatInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -19,26 +16,28 @@ export function ChatInput({ value, onChange, onSubmit, disabled }: ChatInputProp
   }
 
   return (
-    <div className={styles.inputWrapper}>
-      <textarea
-        ref={textareaRef}
-        className={styles.textarea}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Ask something about Colby…"
-        disabled={disabled}
-        rows={1}
-        maxLength={500}
-      />
-      <button
-        className={styles.submit}
-        onClick={onSubmit}
-        disabled={disabled || !value.trim()}
-        aria-label="Send message"
-      >
-        →
-      </button>
+    <div className={styles.inputMessage}>
+      <span className={styles.messageLabel}>you</span>
+      <div className={styles.inputBubble}>
+        <textarea
+          className={styles.inputTextarea}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="say something..."
+          disabled={disabled}
+          rows={1}
+          maxLength={500}
+        />
+        <button
+          className={styles.inputSend}
+          onClick={onSubmit}
+          disabled={disabled || !value.trim()}
+          aria-label="Send message"
+        >
+          →
+        </button>
+      </div>
     </div>
   );
 }
