@@ -8,6 +8,7 @@ export const FloatContext = createContext<FloatContextValue>({
   register: noop,
   unregister: noop,
   setFrozen: noop,
+  returnHome: noop,
 });
 
 export function FloatProvider({ speed, children }: FloatProviderProps) {
@@ -79,8 +80,12 @@ export function FloatProvider({ speed, children }: FloatProviderProps) {
     engineRef.current?.setFrozen(id, frozen);
   }, []);
 
+  const returnHome = useCallback((onComplete?: () => void) => {
+    engineRef.current?.returnHome(onComplete);
+  }, []);
+
   return (
-    <FloatContext value={{ register, unregister, setFrozen }}>
+    <FloatContext value={{ register, unregister, setFrozen, returnHome }}>
       {children}
     </FloatContext>
   );

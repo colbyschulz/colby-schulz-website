@@ -29,6 +29,7 @@ export interface FloatContextValue {
   ) => void;
   unregister: (id: string) => void;
   setFrozen: (id: string, frozen: boolean) => void;
+  returnHome: (onComplete?: () => void) => void;
 }
 
 export interface FloatProviderProps {
