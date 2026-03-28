@@ -2,11 +2,8 @@
 
 .wrapper {
   position: fixed;
-  bottom: 3rem;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
+  top: 2rem;
+  left: 2rem;
   z-index: $z-control-panel;
 }
 
