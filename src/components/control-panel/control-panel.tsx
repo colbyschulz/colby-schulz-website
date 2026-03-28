@@ -8,6 +8,7 @@ interface ControlPanelProps {
   controls: Control[];
   values: ControlValues;
   onChange: (key: string, value: number) => void;
+  onCancelChaos: () => void;
 }
 
 function SliderRow({ control, value, onChange }: {
@@ -49,18 +50,18 @@ function renderControl(control: Control, value: number, onChange: (value: number
   }
 }
 
-export function ControlPanel({ controls, values, onChange }: ControlPanelProps) {
+export function ControlPanel({ controls, values, onChange, onCancelChaos }: ControlPanelProps) {
   const [open, setOpen] = useState(true);
 
   return (
     <div className={styles.panel} data-open={open}>
       <button
-        className={styles.toggle}
+        className={styles.toggleChaos}
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-label="Toggle control panel"
       >
-        Customize
+        Control Chaos
         {open ? <ChevronDownIcon className={styles.chevron} /> : <ChevronUpIcon className={styles.chevron} />}
       </button>
 
@@ -69,6 +70,9 @@ export function ControlPanel({ controls, values, onChange }: ControlPanelProps) 
           {controls.map((control) =>
             renderControl(control, values[control.key], (value) => onChange(control.key, value))
           )}
+          <button className={styles.cancelButton} onClick={onCancelChaos}>
+            Cancel Chaos
+          </button>
         </div>
       )}
     </div>

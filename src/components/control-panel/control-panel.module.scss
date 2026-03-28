@@ -127,3 +127,45 @@
     cursor: grabbing;
   }
 }
+
+.toggleChaos {
+  background: $color-caution;
+  border: 2px solid $color-caution-border;
+  color: $color-caution-border;
+  font-family: $font-base;
+  font-size: $text-sm;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $tracking-ultra;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: #f5cc00;
+  }
+}
+
+.cancelButton {
+  background: $color-cancel;
+  color: $text-primary;
+  border: none;
+  border-radius: 999px;
+  font-family: $font-base;
+  font-size: $text-sm;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wide;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: center;
+
+  &:hover {
+    background: $color-cancel-hover;
+  }
+}
