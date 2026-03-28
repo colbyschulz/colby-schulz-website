@@ -61,7 +61,7 @@ export function ControlPanel({ controls, values, onChange, onCancelChaos }: Cont
         aria-expanded={open}
         aria-label="Toggle control panel"
       >
-        Control Chaos
+        Chaos Controller
         {open ? <ChevronDownIcon className={styles.chevron} /> : <ChevronUpIcon className={styles.chevron} />}
       </button>
 

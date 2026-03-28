@@ -7,7 +7,7 @@
   z-index: $z-control-panel;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.75rem;
 }
 
@@ -49,7 +49,7 @@
   flex-direction: column;
   gap: 1.25rem;
   padding: 1.25rem;
-  border: 1px solid $border-muted;
+  border: 2px solid $color-caution;
   backdrop-filter: blur($blur-glass);
   min-width: 200px;
 }
@@ -67,10 +67,12 @@
 }
 
 .label {
+  font-family: $font-caution;
   font-size: $text-sm;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: $tracking-widest;
-  opacity: 0.6;
+  color: $color-caution;
   user-select: none;
 }
 
@@ -101,7 +103,7 @@
 .sliderRange {
   position: absolute;
   height: 100%;
-  background: rgba(128, 128, 128, 0.6); // intentional: one-off fill, distinct alpha from $border-muted-strong
+  background: $color-caution;
   border-radius: 1px;
 }
 
@@ -109,17 +111,17 @@
   display: block;
   width: 12px;
   height: 12px;
-  background: $text-primary;
-  border: 1px solid $border-muted-strong;
+  background: $color-caution;
+  border: 1px solid $color-caution-border;
   border-radius: 50%;
   cursor: grab;
 
   &:hover {
-    background: #eee; // intentional: slightly darker than thumb on hover
+    background: #f5cc00;
   }
 
   &:focus-visible {
-    outline: 2px solid $text-primary;
+    outline: 2px solid $color-caution;
     outline-offset: 2px;
   }
 
@@ -132,9 +134,9 @@
   background: $color-caution;
   border: 2px solid $color-caution-border;
   color: $color-caution-border;
-  font-family: $font-base;
+  font-family: $font-caution;
   font-size: $text-sm;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: $tracking-ultra;
   padding: 0.5rem 1rem;
@@ -155,7 +157,7 @@
   color: $text-primary;
   border: none;
   border-radius: 999px;
-  font-family: $font-base;
+  font-family: $font-caution;
   font-size: $text-sm;
   font-weight: 700;
   text-transform: uppercase;
