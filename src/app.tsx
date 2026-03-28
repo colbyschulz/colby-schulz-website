@@ -74,7 +74,7 @@ const CONTROLS: Control[] = [
   },
 ];
 
-const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
+const CALM_VALUES: ControlValues = { grain: 50, speed: 0 };
 const CHAOS_VALUES: ControlValues = { grain: 60, speed: 2 };
 
 interface ActiveModal {
