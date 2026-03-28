@@ -2,16 +2,16 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { FloatProvider, FloatContext } from './components/float/float-provider';
 import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
-import { ControlPanel } from './components/control-panel/control-panel';
+import { ChaosPanel } from './components/chaos-panel/chaos-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
 import { Chat } from './components/chat/chat';
 import { Modal } from './components/modal/modal';
-import { ChaosButton } from './components/chaos-button/chaos-button';
 import type { ModalOrigin } from './components/modal/modal.types';
 import type {
   Control,
   ControlValues,
 } from './components/control-panel/control-panel.types';
+
 import type { ComponentType } from 'react';
 import type { Vec2 } from './components/float/float-types';
 import styles from './app.module.scss';
@@ -168,8 +168,6 @@ function App() {
         </FloatProvider>
       </div>
 
-      {!chaosActive && <ChaosButton onClick={handleActivateChaos} />}
-
       {activeModal && activeConfig?.modal && (
         <Modal
           open
@@ -183,14 +181,14 @@ function App() {
 
       <GrainOverlay opacity={controlValues.grain} />
 
-      {chaosActive && (
-        <ControlPanel
-          controls={CONTROLS}
-          values={controlValues}
-          onChange={handleChange}
-          onCancelChaos={handleCancelChaos}
-        />
-      )}
+      <ChaosPanel
+        chaosActive={chaosActive}
+        controls={CONTROLS}
+        values={controlValues}
+        onChange={handleChange}
+        onActivateChaos={handleActivateChaos}
+        onCancelChaos={handleCancelChaos}
+      />
     </ErrorBoundary>
   );
 }
