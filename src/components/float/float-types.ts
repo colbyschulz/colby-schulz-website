@@ -39,5 +39,6 @@ export interface FloatItemProps {
   initialPosition?: Vec2;
   freezeOnHover?: boolean;
   frozen?: boolean;
+  onClick?: (origin: Vec2) => void;
   children: ReactNode;
 }

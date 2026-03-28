@@ -7,6 +7,7 @@ export function FloatItem({
   initialPosition,
   freezeOnHover = false,
   frozen = false,
+  onClick,
   children,
 }: FloatItemProps) {
   const id = useId();
@@ -35,12 +36,22 @@ export function FloatItem({
     if (freezeOnHover && !frozen) setFrozen(id, false);
   };
 
+  const handleClick = () => {
+    if (!onClick || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    onClick({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+  };
+
   return (
     <div
       ref={ref}
-      className={styles.item}
+      className={`${styles.item}${onClick ? ` ${styles.clickable}` : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={onClick ? handleClick : undefined}
     >
       {children}
     </div>

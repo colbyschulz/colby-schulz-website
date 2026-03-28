@@ -1,18 +1,19 @@
+@use './styles/tokens' as *;
+
 :global(body) {
-  font-family: 'Syne', sans-serif;
+  font-family: $font-base;
 }
 
 .container {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  z-index: 1;
+  z-index: $z-float;
 }
 
 .bouncingText {
-  font-size: 3rem;
-  font-weight: 300;
+  font-size: $text-xl;
+  font-weight: $weight-light;
   white-space: nowrap;
   margin: 0;
 }
-

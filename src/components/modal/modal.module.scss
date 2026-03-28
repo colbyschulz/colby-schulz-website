@@ -1,0 +1,86 @@
+@use '../../styles/tokens' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: $surface-overlay;
+  backdrop-filter: blur($blur-glass);
+  z-index: $z-modal-overlay;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.overlayVisible {
+  opacity: 1;
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  height: 85dvh;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  z-index: $z-modal;
+
+  display: flex;
+  flex-direction: column;
+
+  background: $surface-glass;
+  backdrop-filter: blur($blur-modal);
+  border: 1px solid $border-default;
+  box-shadow: $glow-default;
+  border-radius: 16px;
+  color: $text-primary;
+  font-family: $font-base;
+}
+
+.contentVisible {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.title {
+  font-size: $text-lg;
+  font-weight: $weight-light;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $border-subtle;
+  margin: 0;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px 24px;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: $scrollbar-thumb transparent;
+}
+
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid $border-subtle;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeButton {
+  background: transparent;
+  border: 1px solid $border-default;
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  font-family: $font-base;
+  font-size: $text-md;
+  letter-spacing: $tracking-wide;
+  padding: 8px 20px;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: $border-hover;
+  }
+}
