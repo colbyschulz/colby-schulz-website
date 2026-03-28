@@ -60,7 +60,7 @@ export default async function handler(
   try {
     stream = client.messages.stream({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 256,
       system: getSystemPrompt(),
       messages: result,
     });
