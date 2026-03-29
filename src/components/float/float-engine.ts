@@ -167,7 +167,7 @@ export class FloatEngine {
 
   private tickReturnHome(): Map<string, Vec2> {
     let allHome = true;
-    const speed = 12; // px per frame
+    const speed = 24; // px per frame
 
     for (const item of this.items.values()) {
       const dx = item.homePosition.x - item.position.x;
