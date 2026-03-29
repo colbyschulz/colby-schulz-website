@@ -1,8 +1,13 @@
 @use '../../styles/tokens' as *;
+@use '../../styles/breakpoints' as *;
 
 .canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: $z-grain;
+
+  @include mobile {
+    opacity: 0.6;
+  }
 }

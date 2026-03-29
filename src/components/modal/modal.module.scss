@@ -9,6 +9,10 @@
   z-index: $z-modal-overlay;
   opacity: 0;
   transition: opacity 0.3s ease-out;
+
+  @include mobile {
+    backdrop-filter: blur(6px);
+  }
 }
 
 .overlayVisible {
