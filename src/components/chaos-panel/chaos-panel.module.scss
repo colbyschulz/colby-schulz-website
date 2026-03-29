@@ -1,5 +1,7 @@
 @use '../../styles/tokens' as *;
 
+$panel-duration: 0.3s;
+$panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .box {
   pointer-events: auto;
@@ -7,30 +9,41 @@
   border: 2px solid $color-caution-border;
   overflow: hidden;
   position: relative;
-  transition:
-    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &[data-chaos='false'] {
     width: 220px;
     height: 44px;
     cursor: pointer;
+    // Closing: collapse AFTER content fades out
+    transition:
+      width $panel-duration $panel-ease $panel-duration,
+      height $panel-duration $panel-ease $panel-duration;
 
     &:hover {
       filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
       transform: scale(1.03);
-      transition: transform 0.1s, filter 0.1s;
+      transition:
+        transform 0.1s, filter 0.1s,
+        width $panel-duration $panel-ease $panel-duration,
+        height $panel-duration $panel-ease $panel-duration;
     }
 
     &:active {
       transform: scale(0.98);
-      transition: transform 0.05s;
+      transition:
+        transform 0.05s,
+        width $panel-duration $panel-ease $panel-duration,
+        height $panel-duration $panel-ease $panel-duration;
     }
   }
 
   &[data-chaos='true'] {
     width: 220px;
     height: 260px;
+    // Opening: expand immediately
+    transition:
+      width $panel-duration $panel-ease,
+      height $panel-duration $panel-ease;
   }
 }
 
@@ -42,10 +55,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  // Closing: fade in AFTER box collapses
+  transition: opacity $panel-duration $panel-duration;
 
   .box[data-chaos='true'] & {
     opacity: 0;
     pointer-events: none;
+    // Opening: fade out immediately
+    transition: opacity $panel-duration;
   }
 }
 
@@ -68,10 +85,16 @@
   flex-direction: column;
   padding: 1.25rem;
   gap: 1rem;
+  opacity: 0;
   pointer-events: none;
+  // Closing: fade out immediately
+  transition: opacity $panel-duration;
 
   .box[data-chaos='true'] & {
+    opacity: 1;
     pointer-events: auto;
+    // Opening: fade in AFTER box expands
+    transition: opacity $panel-duration $panel-duration;
   }
 }
 
