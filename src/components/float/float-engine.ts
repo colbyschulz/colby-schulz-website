@@ -26,8 +26,9 @@ export class FloatEngine {
       x: Math.random() * Math.max(0, maxX),
       y: Math.random() * Math.max(0, maxY),
     };
-    const dirX = Math.random() > 0.5 ? 1 : -1;
-    const dirY = Math.random() > 0.5 ? 1 : -1;
+    const angle = Math.random() * 2 * Math.PI;
+    const dirX = Math.cos(angle);
+    const dirY = Math.sin(angle);
 
     this.items.set(id, {
       id,
