@@ -76,6 +76,12 @@ export class FloatEngine {
     }
   }
 
+  setSize(id: string, size: Size): void {
+    const item = this.items.get(id);
+    if (!item) return;
+    item.size = size;
+  }
+
   setViewport(width: number, height: number): void {
     this.viewportWidth = width;
     this.viewportHeight = height;

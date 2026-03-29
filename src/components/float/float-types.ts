@@ -29,6 +29,7 @@ export interface FloatContextValue {
   ) => void;
   unregister: (id: string) => void;
   setFrozen: (id: string, frozen: boolean) => void;
+  setSize: (id: string, size: Size) => void;
   returnHome: (onComplete?: () => void) => void;
 }
 

@@ -60,6 +60,33 @@
   user-select: none;
 }
 
+// ─── Returning face ───────────────────────────────────────────────────────────
+
+.returningFace {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+
+  .box[data-returning='true'] & {
+    opacity: 1;
+  }
+}
+
+.returningLabel {
+  font-family: $font-caution;
+  font-size: $text-sm;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wide;
+  color: $color-caution-border;
+  user-select: none;
+}
+
 // ─── Panel face ───────────────────────────────────────────────────────────────
 
 .panelFace {
@@ -73,7 +100,7 @@
   pointer-events: none;
   transition: opacity 0.2s 0.25s;
 
-  .box[data-chaos='true'] & {
+  .box[data-chaos='true']:not([data-returning='true']) & {
     opacity: 1;
     pointer-events: auto;
   }

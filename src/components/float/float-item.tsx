@@ -12,7 +12,7 @@ export function FloatItem({
 }: FloatItemProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
-  const { register, unregister, setFrozen } = useContext(FloatContext);
+  const { register, unregister, setFrozen, setSize } = useContext(FloatContext);
 
   useEffect(() => {
     const el = ref.current;
@@ -27,6 +27,19 @@ export function FloatItem({
   useEffect(() => {
     setFrozen(id, frozen);
   }, [id, frozen, setFrozen]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      setSize(id, { width, height });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [id, setSize]);
 
   const handleMouseEnter = () => {
     if (freezeOnHover && !frozen) setFrozen(id, true);

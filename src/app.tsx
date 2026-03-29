@@ -108,6 +108,7 @@ function ReturnHomeBridge({
 
 function App() {
   const [chaosActive, setChaosActive] = useState(false);
+  const [returning, setReturning] = useState(false);
   const [controlValues, setControlValues] =
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
@@ -146,8 +147,10 @@ function App() {
   }, []);
 
   const handleCancelChaos = useCallback(() => {
+    setReturning(true);
     returnHomeRef.current?.(() => {
       setChaosActive(false);
+      setReturning(false);
       setControlValues(CALM_VALUES);
     });
   }, []);
@@ -190,6 +193,7 @@ function App() {
           >
             <ChaosPanel
               chaosActive={chaosActive}
+              returning={returning}
               controls={CONTROLS}
               values={controlValues}
               onChange={handleChange}

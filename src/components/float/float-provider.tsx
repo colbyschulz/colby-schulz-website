@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useRef } from 'react';
 import { FloatEngine } from './float-engine.ts';
-import type { FloatContextValue, FloatProviderProps, Vec2 } from './float-types.ts';
+import type { FloatContextValue, FloatProviderProps, Size, Vec2 } from './float-types.ts';
 
 const noop = () => {};
 
@@ -8,6 +8,7 @@ export const FloatContext = createContext<FloatContextValue>({
   register: noop,
   unregister: noop,
   setFrozen: noop,
+  setSize: noop,
   returnHome: noop,
 });
 
@@ -80,12 +81,16 @@ export function FloatProvider({ speed, children }: FloatProviderProps) {
     engineRef.current?.setFrozen(id, frozen);
   }, []);
 
+  const setSize = useCallback((id: string, size: Size) => {
+    engineRef.current?.setSize(id, size);
+  }, []);
+
   const returnHome = useCallback((onComplete?: () => void) => {
     engineRef.current?.returnHome(onComplete);
   }, []);
 
   return (
-    <FloatContext value={{ register, unregister, setFrozen, returnHome }}>
+    <FloatContext value={{ register, unregister, setFrozen, setSize, returnHome }}>
       {children}
     </FloatContext>
   );
