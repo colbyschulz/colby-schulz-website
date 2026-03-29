@@ -1,0 +1,50 @@
+@use '@/styles/tokens' as *;
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 160px;
+  min-width: 125px;
+  transition: transform 0.1s;
+
+  @keyframes maxPowerJiggle {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(-1px, 0.5px) rotate(-0.25deg); }
+    50%  { transform: translate(1px, -0.5px) rotate(0.25deg); }
+    75%  { transform: translate(-0.5px, -0.5px) rotate(-0.15deg); }
+    100% { transform: translate(0.5px, 0.5px) rotate(0.15deg); }
+  }
+
+  &:hover {
+    animation: maxPowerJiggle 0.15s linear infinite;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.label {
+  position: absolute;
+  font-family: $font-caution;
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: $tracking-widest;
+  color: $color-caution-border;
+  text-align: center;
+  user-select: none;
+  line-height: 1.2;
+}
