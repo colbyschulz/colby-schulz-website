@@ -1,4 +1,5 @@
 @use '../../styles/tokens' as *;
+@use '../../styles/breakpoints' as *;
 
 // Chat container — fills modal bodyFill
 
@@ -72,6 +73,10 @@
     background: $border-subtle; // reuses border-subtle value (rgba 255,255,255,0.1) as a subtle fill
     padding: 8px 12px;
     border-radius: 12px 12px 2px 12px;
+
+    @include mobile {
+      max-width: 90%;
+    }
   }
 }
 
@@ -101,6 +106,10 @@
   padding: 8px 12px;
   min-width: 18ch; // approximates width of "say something..." placeholder
   max-width: 75%;
+
+  @include mobile {
+    max-width: 90%;
+  }
 }
 
 .inputTextarea {

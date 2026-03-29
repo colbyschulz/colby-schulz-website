@@ -84,13 +84,17 @@ interface ActiveModal {
 
 const ITEM_HEIGHT_ESTIMATE = 48; // ~3rem at 16px base
 const STACK_GAP = 40; // ~2.5rem
+const MOBILE_BREAKPOINT = 768;
 
 function getStackPositions(count: number): Vec2[] {
-  const totalHeight = count * ITEM_HEIGHT_ESTIMATE + (count - 1) * STACK_GAP;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+  const gap = isMobile ? 24 : STACK_GAP;
+  const totalHeight = count * ITEM_HEIGHT_ESTIMATE + (count - 1) * gap;
   const startY = (window.innerHeight - totalHeight) / 2;
+  const xOffset = isMobile ? 60 : 100;
   return Array.from({ length: count }, (_, i) => ({
-    x: window.innerWidth / 2 - 100,
-    y: startY + i * (ITEM_HEIGHT_ESTIMATE + STACK_GAP),
+    x: window.innerWidth / 2 - xOffset,
+    y: startY + i * (ITEM_HEIGHT_ESTIMATE + gap),
   }));
 }
 
@@ -119,16 +123,20 @@ function App() {
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
   // Computed once on mount — no setter needed since positions are static.
   const [{ stackPositions, chaosPanelPosition }] = useState(() => {
+    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
     const positions = getStackPositions(FLOAT_ITEMS.length);
+    const gap = isMobile ? 24 : STACK_GAP;
     return {
       stackPositions: positions,
-      chaosPanelPosition: {
-        x: window.innerWidth / 2 - 110, // centers the 220px panel
-        y:
-          positions[FLOAT_ITEMS.length - 1].y +
-          ITEM_HEIGHT_ESTIMATE +
-          STACK_GAP,
-      },
+      chaosPanelPosition: isMobile
+        ? { x: 0, y: window.innerHeight - 44 }
+        : {
+            x: window.innerWidth / 2 - 110,
+            y:
+              positions[FLOAT_ITEMS.length - 1].y +
+              ITEM_HEIGHT_ESTIMATE +
+              gap,
+          },
     };
   });
   const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(
