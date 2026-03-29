@@ -8,3 +8,7 @@
 ## File naming
 
 - All files and directories must use kebab-case (e.g. `bouncing-text.tsx`, `control-panel.module.scss`).
+
+## Git
+
+- Never commit or push without explicit user approval.
