@@ -31,10 +31,12 @@ export class FloatEngine {
   ): void {
     const maxX = this.viewportWidth - size.width;
     const maxY = this.viewportHeight - size.height;
-    const position = initialPosition ?? {
-      x: Math.random() * Math.max(0, maxX),
-      y: Math.random() * Math.max(0, maxY),
-    };
+    const position = initialPosition
+      ? { x: initialPosition.x - size.width / 2, y: initialPosition.y }
+      : {
+          x: Math.random() * Math.max(0, maxX),
+          y: Math.random() * Math.max(0, maxY),
+        };
     // Unit vector for initial travel direction — used by setSpeed/setFrozen
     // to recompute velocity when speed changes without losing direction.
     const angle = Math.random() * 2 * Math.PI;
@@ -102,8 +104,9 @@ export class FloatEngine {
   setHome(id: string, position: Vec2): void {
     const item = this.items.get(id);
     if (!item) return;
-    item.homePosition = { ...position };
-    item.position = { ...position };
+    const centered = { x: position.x - item.size.width / 2, y: position.y };
+    item.homePosition = { ...centered };
+    item.position = { ...centered };
   }
 
   returnHome(onComplete?: () => void): void {

@@ -1,5 +1,14 @@
 @use '../../styles/breakpoints' as *;
 
+@keyframes scalePulse {
+  0%, 100% {
+    scale: 1;
+  }
+  50% {
+    scale: calc(1 + var(--scale-amplitude, 0) * 0.005);
+  }
+}
+
 .item {
   position: absolute;
   top: 0;
@@ -9,21 +18,21 @@
 
 .inner {
   transition: transform 0.2s;
+  animation: scalePulse 1s ease-in-out infinite;
 }
 
 .clickable {
   cursor: pointer;
 
   .inner {
-    transform: translateX(-50%);
-
     @include mobile {
       padding: 8px 12px;
     }
   }
 
   &:hover .inner {
-    transform: translateX(-50%) scale(1.05);
+    transform: scale(1.05);
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+    animation-play-state: paused;
   }
 }

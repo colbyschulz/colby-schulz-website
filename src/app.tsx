@@ -72,10 +72,27 @@ const CONTROLS: Control[] = [
     step: 0.5,
     defaultValue: 2,
   },
+  {
+    type: 'slider',
+    key: 'scalePulse',
+    label: 'Scale Pulse',
+    min: 0,
+    max: 200,
+    step: 1,
+    defaultValue: 0,
+  },
 ];
 
-const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
-const CHAOS_VALUES: ControlValues = { grain: 120, speed: 3 };
+const CALM_VALUES: ControlValues = {
+  grain: 0,
+  speed: 0,
+  scalePulse: 0,
+};
+const CHAOS_VALUES: ControlValues = {
+  grain: 120,
+  speed: 3,
+  scalePulse: 70,
+};
 
 interface ActiveModal {
   key: string;
@@ -125,7 +142,8 @@ function App() {
   );
 
   useEffect(() => {
-    const handleResize = () => setStackPositions(getStackPositions(FLOAT_ITEMS.length));
+    const handleResize = () =>
+      setStackPositions(getStackPositions(FLOAT_ITEMS.length));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -172,7 +190,14 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        style={
+          {
+            '--scale-amplitude': controlValues.scalePulse,
+          } as React.CSSProperties
+        }
+      >
         <FloatProvider speed={controlValues.speed}>
           <ReturnHomeBridge onCapture={captureReturnHome} />
           {FLOAT_ITEMS.map((item, i) => (
