@@ -124,18 +124,25 @@ interface ActiveModal {
   origin: ModalOrigin;
 }
 
-const ITEM_HEIGHT_ESTIMATE = 48; // ~3rem at 16px base
-const STACK_GAP = 40; // ~2.5rem
 const MOBILE_BREAKPOINT = 768;
+// Height estimates reflect actual SVG icon rendered heights (aspect ratio × rendered width).
+// Desktop avg ~151px across the 4 icons; mobile avg ~121px.
+const ITEM_HEIGHT_ESTIMATE_DESKTOP = 151;
+const ITEM_HEIGHT_ESTIMATE_MOBILE = 121;
+const STACK_GAP_DESKTOP = 72;
+const STACK_GAP_MOBILE = 20;
 
 function getStackPositions(count: number): Vec2[] {
   const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const gap = isMobile ? 24 : STACK_GAP;
-  const totalHeight = count * ITEM_HEIGHT_ESTIMATE + (count - 1) * gap;
+  const itemHeight = isMobile
+    ? ITEM_HEIGHT_ESTIMATE_MOBILE
+    : ITEM_HEIGHT_ESTIMATE_DESKTOP;
+  const gap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
+  const totalHeight = count * itemHeight + (count - 1) * gap;
   const startY = (window.innerHeight - totalHeight) / 2;
   return Array.from({ length: count }, (_, i) => ({
     x: window.innerWidth / 2,
-    y: startY + i * (ITEM_HEIGHT_ESTIMATE + gap),
+    y: startY + i * (itemHeight + gap),
   }));
 }
 
