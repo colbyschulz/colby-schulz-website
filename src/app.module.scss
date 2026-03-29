@@ -1,8 +1,10 @@
 @use './styles/tokens' as *;
 @use './styles/breakpoints' as *;
 
+:global(html),
 :global(body) {
   font-family: $font-base;
+  touch-action: manipulation;
 }
 
 .container {
