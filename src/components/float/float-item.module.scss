@@ -1,3 +1,5 @@
+@use '../../styles/breakpoints' as *;
+
 .item {
   position: absolute;
   top: 0;
@@ -7,6 +9,10 @@
 
 .inner {
   transition: transform 0.2s;
+
+  @include mobile {
+    padding: 8px 12px;
+  }
 }
 
 .clickable {
