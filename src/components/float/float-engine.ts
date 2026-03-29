@@ -167,7 +167,7 @@ export class FloatEngine {
 
   private tickReturnHome(): Map<string, Vec2> {
     let allHome = true;
-    const lerpFactor = 0.08;
+    const lerpFactor = 0.18;
     const snapThreshold = 0.5;
 
     for (const item of this.items.values()) {
