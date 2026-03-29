@@ -1,4 +1,5 @@
 @use '../../styles/tokens' as *;
+@use '../../styles/breakpoints' as *;
 
 .overlay {
   position: fixed;
@@ -35,6 +36,14 @@
   border-radius: 16px;
   color: $text-primary;
   font-family: $font-base;
+
+  @include mobile {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
 }
 
 .contentVisible {
@@ -79,6 +88,12 @@
   letter-spacing: $tracking-wide;
   padding: 8px 20px;
   transition: border-color 0.15s;
+
+  @include mobile {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 24px;
+  }
 
   &:hover {
     border-color: $border-hover;
