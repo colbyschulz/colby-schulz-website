@@ -61,8 +61,8 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   .box[data-chaos='true'] & {
     opacity: 0;
     pointer-events: none;
-    // Opening: fade out immediately
-    transition: opacity $panel-duration;
+    // Opening: hide instantly
+    transition: none;
   }
 }
 
