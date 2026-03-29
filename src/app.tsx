@@ -75,7 +75,7 @@ const CONTROLS: Control[] = [
 ];
 
 const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
-const CHAOS_VALUES: ControlValues = { grain: 60, speed: 2 };
+const CHAOS_VALUES: ControlValues = { grain: 90, speed: 2 };
 
 interface ActiveModal {
   key: string;
@@ -108,7 +108,6 @@ function ReturnHomeBridge({
 
 function App() {
   const [chaosActive, setChaosActive] = useState(false);
-  const [returning, setReturning] = useState(false);
   const [controlValues, setControlValues] =
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
@@ -119,7 +118,10 @@ function App() {
       stackPositions: positions,
       chaosPanelPosition: {
         x: window.innerWidth / 2 - 110, // centers the 220px panel
-        y: positions[FLOAT_ITEMS.length - 1].y + ITEM_HEIGHT_ESTIMATE + STACK_GAP,
+        y:
+          positions[FLOAT_ITEMS.length - 1].y +
+          ITEM_HEIGHT_ESTIMATE +
+          STACK_GAP,
       },
     };
   });
@@ -147,10 +149,8 @@ function App() {
   }, []);
 
   const handleCancelChaos = useCallback(() => {
-    setReturning(true);
     returnHomeRef.current?.(() => {
       setChaosActive(false);
-      setReturning(false);
       setControlValues(CALM_VALUES);
     });
   }, []);
@@ -193,7 +193,6 @@ function App() {
           >
             <ChaosPanel
               chaosActive={chaosActive}
-              returning={returning}
               controls={CONTROLS}
               values={controlValues}
               onChange={handleChange}
