@@ -1,0 +1,29 @@
+@use './float-icon' as *;
+
+.wrapper {
+  @include wrapper;
+}
+
+.svg {
+  @include svg;
+  width: 260px;
+
+  @include mobile {
+    width: 210px;
+  }
+}
+
+.shape {
+  @include shape;
+}
+
+.label {
+  @include label;
+  top: 58%;
+  left: 65%;
+  font-size: 0.95rem;
+  white-space: normal;
+  text-align: center;
+  max-width: 45%;
+  line-height: 1.4;
+}
