@@ -1,5 +1,6 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { FloatProvider, FloatContext } from './components/float/float-provider';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FloatProvider } from './components/float/float-provider';
+import type { FloatProviderHandle } from './components/float/float-types';
 import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ChaosPanel } from './components/chaos-panel/chaos-panel';
@@ -40,15 +41,15 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     freezeOnHover: true,
   },
   {
-    key: 'chatbot',
-    label: 'Ask anything',
-    modal: { title: 'Chat', content: Chat },
+    key: 'conteact',
+    label: 'Contact',
+    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
   },
   {
-    key: 'links',
-    label: 'Links',
-    modal: { title: 'Links', content: () => <p>Links coming soon.</p> },
+    key: 'chatbot',
+    label: 'Ask Colbot!',
+    modal: { title: 'Chat', content: Chat },
     freezeOnHover: true,
   },
 ];
@@ -57,7 +58,7 @@ const CONTROLS: Control[] = [
   {
     type: 'slider',
     key: 'grain',
-    label: 'Grain',
+    label: 'Grain Intensity',
     min: 0,
     max: 200,
     step: 1,
@@ -75,9 +76,18 @@ const CONTROLS: Control[] = [
   {
     type: 'slider',
     key: 'scalePulse',
-    label: 'Scale Pulse',
+    label: 'Scale Pulse Magnitude',
     min: 0,
     max: 200,
+    step: 1,
+    defaultValue: 0,
+  },
+  {
+    type: 'slider',
+    key: 'glowCycle',
+    label: 'Glow Cycle',
+    min: 0,
+    max: 20,
     step: 1,
     defaultValue: 0,
   },
@@ -87,11 +97,13 @@ const CALM_VALUES: ControlValues = {
   grain: 0,
   speed: 0,
   scalePulse: 0,
+  glowCycle: 0,
 };
 const CHAOS_VALUES: ControlValues = {
   grain: 120,
   speed: 3,
   scalePulse: 70,
+  glowCycle: 5,
 };
 
 interface ActiveModal {
@@ -114,23 +126,6 @@ function getStackPositions(count: number): Vec2[] {
   }));
 }
 
-/**
- * Bridge to access FloatContext.returnHome from App (which sits above
- * FloatProvider). Renders nothing — just forwards the context method
- * to a parent ref via onCapture so App can trigger returnHome.
- */
-function ReturnHomeBridge({
-  onCapture,
-}: {
-  onCapture: (fn: (onComplete?: () => void) => void) => void;
-}) {
-  const { returnHome } = useContext(FloatContext);
-  useEffect(() => {
-    onCapture(returnHome);
-  }, [returnHome, onCapture]);
-  return null;
-}
-
 function App() {
   const [chaosActive, setChaosActive] = useState(false);
   const [controlValues, setControlValues] =
@@ -147,9 +142,7 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(
-    null,
-  );
+  const floatProviderRef = useRef<FloatProviderHandle>(null);
 
   const handleChange = useCallback((key: string, value: number) => {
     setControlValues((prev) => ({ ...prev, [key]: value }));
@@ -171,18 +164,19 @@ function App() {
   }, []);
 
   const handleCancelChaos = useCallback(() => {
-    returnHomeRef.current?.(() => {
+    floatProviderRef.current?.returnHome(() => {
       setChaosActive(false);
       setControlValues(CALM_VALUES);
     });
   }, []);
 
-  const captureReturnHome = useCallback(
-    (fn: (onComplete?: () => void) => void) => {
-      returnHomeRef.current = fn;
-    },
-    [],
-  );
+  const handleMaxPower = useCallback(() => {
+    const maxValues = CONTROLS.reduce<ControlValues>((acc, control) => {
+      acc[control.key] = control.max;
+      return acc;
+    }, {});
+    setControlValues(maxValues);
+  }, []);
 
   const activeConfig = activeModal
     ? FLOAT_ITEMS.find((item) => item.key === activeModal.key)
@@ -195,17 +189,19 @@ function App() {
         style={
           {
             '--scale-amplitude': controlValues.scalePulse,
+            '--glow-speed': controlValues.glowCycle,
           } as React.CSSProperties
         }
       >
-        <FloatProvider speed={controlValues.speed}>
-          <ReturnHomeBridge onCapture={captureReturnHome} />
+        <FloatProvider ref={floatProviderRef} speed={controlValues.speed}>
           {FLOAT_ITEMS.map((item, i) => (
             <FloatItem
               key={item.key}
               initialPosition={stackPositions[i]}
               freezeOnHover={chaosActive && (item.freezeOnHover ?? false)}
               frozen={frozenKey === item.key}
+              chaosActive={chaosActive}
+              staggerIndex={i}
               onClick={
                 item.modal
                   ? (origin) => handleItemClick(item.key, origin)
@@ -226,6 +222,7 @@ function App() {
           onChange={handleChange}
           onActivateChaos={handleActivateChaos}
           onCancelChaos={handleCancelChaos}
+          onMaxPower={handleMaxPower}
         />
       </div>
 

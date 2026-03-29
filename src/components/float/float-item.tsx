@@ -1,5 +1,5 @@
 import { useContext, useEffect, useId, useRef } from 'react';
-import { FloatContext } from './float-provider.tsx';
+import { FloatContext } from './float-context.ts';
 import type { FloatItemProps } from './float-types.ts';
 import styles from './float-item.module.scss';
 
@@ -7,6 +7,8 @@ export function FloatItem({
   initialPosition,
   freezeOnHover = false,
   frozen = false,
+  chaosActive = false,
+  staggerIndex,
   onClick,
   children,
 }: FloatItemProps) {
@@ -68,13 +70,19 @@ export function FloatItem({
     <div
       ref={ref}
       className={`${styles.item}${onClick ? ` ${styles.clickable}` : ''}`}
+      data-chaos={chaosActive}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick ? handleClick : undefined}
     >
       {/* Inner wrapper for hover scale — can't scale .item directly
           because the engine sets its transform (translate) every frame. */}
-      <div className={styles.inner}>{children}</div>
+      <div
+        className={styles.inner}
+        style={{ '--stagger-index': staggerIndex ?? 0 } as React.CSSProperties}
+      >
+        {children}
+      </div>
     </div>
   );
 }

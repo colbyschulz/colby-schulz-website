@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import type { Control, ControlValues } from './chaos-panel.types';
+import { MaxPowerButton } from './max-power-button/max-power-button';
 import styles from './chaos-panel.module.scss';
 
 interface ChaosPanelProps {
@@ -9,6 +11,7 @@ interface ChaosPanelProps {
   onChange: (key: string, value: number) => void;
   onActivateChaos: () => void;
   onCancelChaos: () => void;
+  onMaxPower: () => void;
 }
 
 function SliderRow({
@@ -54,12 +57,23 @@ export function ChaosPanel({
   onChange,
   onActivateChaos,
   onCancelChaos,
+  onMaxPower,
 }: ChaosPanelProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [prevChaosActive, setPrevChaosActive] = useState(chaosActive);
+
+  // Reset collapsed state when chaos deactivates (render-time derived state)
+  if (prevChaosActive !== chaosActive) {
+    setPrevChaosActive(chaosActive);
+    if (!chaosActive) setCollapsed(false);
+  }
+
   return (
     <div
       className={styles.box}
       data-chaos={chaosActive}
-      onClick={!chaosActive ? onActivateChaos : undefined}
+      data-collapsed={chaosActive && collapsed}
+      onClick={!chaosActive ? onActivateChaos : (chaosActive && collapsed ? () => setCollapsed(false) : undefined)}
     >
       <div className={styles.calmFace}>
         <div className={styles.calmStripe}>
@@ -79,10 +93,17 @@ export function ChaosPanel({
         </div>
       </div>
 
+      <button
+        className={styles.panelTab}
+        onClick={(e) => { e.stopPropagation(); setCollapsed((c) => !c); }}
+      >
+        Chaos Controller
+        <span className={styles.panelTabChevron}>{collapsed ? '▲' : '▼'}</span>
+      </button>
+
       <div className={styles.panelFaceOuter}>
         <div className={styles.panelFace}>
           <div className={styles.panelFaceInner}>
-            <span className={styles.panelHeader}>Chaos Controller</span>
             <div className={styles.controls}>
               {controls.map((control) => {
                 if (control.type !== 'slider') return null;
@@ -96,9 +117,12 @@ export function ChaosPanel({
                 );
               })}
             </div>
-            <button className={styles.cancelButton} onClick={onCancelChaos}>
-              please stop
-            </button>
+            <div className={styles.panelActions}>
+              <MaxPowerButton onClick={onMaxPower} />
+              <button className={styles.cancelButton} onClick={onCancelChaos}>
+                please stop
+              </button>
+            </div>
           </div>
         </div>
       </div>

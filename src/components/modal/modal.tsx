@@ -1,27 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import type { ModalProps } from './modal.types.ts';
 import styles from './modal.module.scss';
 
 export function Modal({ open, onClose, title, origin, children }: ModalProps) {
-  const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Trigger open animation after mount
-  useEffect(() => {
-    if (open) {
-      const id = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(id);
-    } else {
-      setVisible(false);
-      setClosing(false);
-    }
-  }, [open]);
-
   const handleClose = () => {
     setClosing(true);
-    setVisible(false);
   };
 
   const handleTransitionEnd = (e: React.TransitionEvent) => {
@@ -44,10 +31,12 @@ export function Modal({ open, onClose, title, origin, children }: ModalProps) {
   return (
     <Dialog.Root open={open}>
       <Dialog.Portal>
-        <Dialog.Overlay className={`${styles.overlay}${visible ? ` ${styles.overlayVisible}` : ''}`} />
+        <Dialog.Overlay
+          className={`${styles.overlay}${closing ? ` ${styles.overlayClosing}` : ''}`}
+        />
         <Dialog.Content
           ref={contentRef}
-          className={`${styles.content}${visible ? ` ${styles.contentVisible}` : ''}`}
+          className={`${styles.content}${closing ? ` ${styles.contentClosing}` : ''}`}
           style={originStyle}
           onTransitionEnd={handleTransitionEnd}
           onEscapeKeyDown={(e) => e.preventDefault()}

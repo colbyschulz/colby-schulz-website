@@ -7,7 +7,8 @@ export interface Message {
 
 const INITIAL_MESSAGE: Message = {
   role: 'assistant',
-  content: "Hey, I'm Colby's friend, James! Feel free to ask me anything about Colby.",
+  content:
+    "Hey, I'm Colby's friend, Colbot! Feel free to ask me anything about him.",
 };
 
 export function useChat() {
@@ -88,5 +89,14 @@ export function useChat() {
     }
   }
 
-  return { messages, input, setInput, isLoading, error, sendMessage, messagesEndRef, inputRef };
+  return {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    error,
+    sendMessage,
+    messagesEndRef,
+    inputRef,
+  };
 }

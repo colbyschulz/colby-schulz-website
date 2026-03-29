@@ -1,23 +1,13 @@
-import { createContext, useCallback, useEffect, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { FloatEngine } from './float-engine.ts';
-import type { FloatContextValue, FloatProviderProps, Size, Vec2 } from './float-types.ts';
+import { FloatContext } from './float-context.ts';
+import type { FloatProviderHandle, FloatProviderProps, Size, Vec2 } from './float-types.ts';
 
-const noop = () => {};
-
-export const FloatContext = createContext<FloatContextValue>({
-  register: noop,
-  unregister: noop,
-  setFrozen: noop,
-  setSize: noop,
-  setHome: noop,
-  returnHome: noop,
-});
-
-export function FloatProvider({ speed, children }: FloatProviderProps) {
+export const FloatProvider = forwardRef<FloatProviderHandle, FloatProviderProps>(function FloatProvider({ speed, children }, ref) {
   const engineRef = useRef<FloatEngine | null>(null);
   const animRef = useRef<number>(0);
 
-  if (!engineRef.current) {
+  if (engineRef.current == null) {
     engineRef.current = new FloatEngine(
       speed,
       window.innerWidth,
@@ -94,9 +84,11 @@ export function FloatProvider({ speed, children }: FloatProviderProps) {
     engineRef.current?.returnHome(onComplete);
   }, []);
 
+  useImperativeHandle(ref, () => ({ returnHome }), [returnHome]);
+
   return (
     <FloatContext value={{ register, unregister, setFrozen, setSize, setHome, returnHome }}>
       {children}
     </FloatContext>
   );
-}
+});

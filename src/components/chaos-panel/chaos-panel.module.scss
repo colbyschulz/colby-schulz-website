@@ -1,8 +1,16 @@
-@use '../../styles/tokens' as *;
-@use '../../styles/breakpoints' as *;
+@use '@/styles/tokens' as *;
+@use '@/styles/breakpoints' as *;
 
 $panel-duration: 0.3s;
 $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+@keyframes jiggle {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-1px, 0.5px) rotate(-0.25deg); }
+  50% { transform: translate(1px, -0.5px) rotate(0.25deg); }
+  75% { transform: translate(-0.5px, -0.5px) rotate(-0.15deg); }
+  100% { transform: translate(0.5px, 0.5px) rotate(0.15deg); }
+}
 
 .box {
   pointer-events: auto;
@@ -17,20 +25,25 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
-      transform: scale(1.03);
-      transition:
-        transform 0.1s,
-        filter 0.1s;
+      animation: jiggle 0.15s linear infinite;
     }
 
     &:active {
+      animation: none;
       transform: scale(0.98);
       transition: transform 0.05s;
     }
   }
 
   &[data-chaos='true'] {
+    overflow: visible;
     background: rgba(240, 192, 0, 0.85);
+  }
+
+  &[data-collapsed='true'] {
+    cursor: pointer;
+    animation: jiggle 0.15s linear infinite;
+    border-top: none;
   }
 }
 
@@ -121,6 +134,39 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
+// ─── Panel tab ───────────────────────────────────────────────────────────────
+
+.panelTab {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 1rem;
+  background: rgba(240, 192, 0, 0.85);
+  border: 2px solid $color-caution-border;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 0.4rem 1rem;
+  font-family: $font-caution;
+  font-size: $text-sm;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: $tracking-ultra;
+  color: $color-caution-border;
+  user-select: none;
+  cursor: pointer;
+
+  .box[data-chaos='true'] & {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.panelTabChevron {
+  font-size: 0.6rem;
+  color: $color-caution-border;
+}
+
 // ─── Panel face ───────────────────────────────────────────────────────────────
 
 .panelFaceOuter {
@@ -128,7 +174,7 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   grid-template-rows: 0fr;
   transition: grid-template-rows $panel-duration $panel-ease;
 
-  .box[data-chaos='true'] & {
+  .box[data-chaos='true']:not([data-collapsed='true']) & {
     grid-template-rows: 1fr;
   }
 }
@@ -150,24 +196,14 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-.panelHeader {
-  font-family: $font-caution;
-  font-size: $text-sm;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: $tracking-ultra;
-  color: $color-caution-border;
-  user-select: none;
-}
 
 .controls {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
 
   @include mobile {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 0.6rem;
   }
 }
@@ -260,6 +296,14 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+.panelActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
 .cancelButton {
   background: $color-cancel;
   color: $text-primary;
@@ -270,11 +314,9 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: $tracking-wide;
-  padding: 0.5rem 1.25rem;
+  padding: calc(0.5rem + 3px) 1.25rem 0.5rem;
   cursor: pointer;
   transition: background 0.2s;
-  align-self: flex-end;
-  margin-top: 0.75rem;
 
   @include mobile {
     min-height: 44px;

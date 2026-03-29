@@ -1,4 +1,4 @@
-import { useChat } from '../../hooks/use-chat';
+import { useChat } from '@/hooks/use-chat';
 import { ChatMessage } from './chat-message';
 import { ChatInput } from './chat-input';
 import styles from './chat.module.scss';

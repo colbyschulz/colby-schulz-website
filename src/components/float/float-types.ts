@@ -39,10 +39,16 @@ export interface FloatProviderProps {
   children: ReactNode;
 }
 
+export interface FloatProviderHandle {
+  returnHome: (onComplete?: () => void) => void;
+}
+
 export interface FloatItemProps {
   initialPosition?: Vec2;
   freezeOnHover?: boolean;
   frozen?: boolean;
+  chaosActive?: boolean;
+  staggerIndex?: number;
   onClick?: (origin: Vec2) => void;
   children: ReactNode;
 }

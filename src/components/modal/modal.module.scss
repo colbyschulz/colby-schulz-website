@@ -1,5 +1,5 @@
-@use '../../styles/tokens' as *;
-@use '../../styles/breakpoints' as *;
+@use '@/styles/tokens' as *;
+@use '@/styles/breakpoints' as *;
 
 .overlay {
   position: fixed;
@@ -7,7 +7,7 @@
   background: $surface-overlay;
   backdrop-filter: blur($blur-glass);
   z-index: $z-modal-overlay;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s ease-out;
 
   @include mobile {
@@ -15,8 +15,8 @@
   }
 }
 
-.overlayVisible {
-  opacity: 1;
+.overlayClosing {
+  opacity: 0;
 }
 
 .content {
@@ -25,8 +25,8 @@
   left: 50%;
   width: 90vw;
   height: 85dvh;
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   z-index: $z-modal;
 
@@ -50,9 +50,22 @@
   }
 }
 
-.contentVisible {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
+.contentClosing {
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+}
+
+// Enter animations via @starting-style — no JS frame deferral needed.
+// These define the before-first-paint state so the browser can transition in.
+@starting-style {
+  .overlay {
+    opacity: 0;
+  }
+
+  .content {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
 }
 
 .title {
