@@ -99,6 +99,13 @@ export class FloatEngine {
     this.viewportHeight = height;
   }
 
+  setHome(id: string, position: Vec2): void {
+    const item = this.items.get(id);
+    if (!item) return;
+    item.homePosition = { ...position };
+    item.position = { ...position };
+  }
+
   returnHome(onComplete?: () => void): void {
     this.returning = true;
     this.onReturnComplete = onComplete ?? null;

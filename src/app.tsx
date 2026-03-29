@@ -91,9 +91,8 @@ function getStackPositions(count: number): Vec2[] {
   const gap = isMobile ? 24 : STACK_GAP;
   const totalHeight = count * ITEM_HEIGHT_ESTIMATE + (count - 1) * gap;
   const startY = (window.innerHeight - totalHeight) / 2;
-  const xOffset = isMobile ? 60 : 100;
   return Array.from({ length: count }, (_, i) => ({
-    x: window.innerWidth / 2 - xOffset,
+    x: window.innerWidth / 2,
     y: startY + i * (ITEM_HEIGHT_ESTIMATE + gap),
   }));
 }
@@ -121,24 +120,15 @@ function App() {
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
-  // Computed once on mount — no setter needed since positions are static.
-  const [{ stackPositions, chaosPanelPosition }] = useState(() => {
-    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-    const positions = getStackPositions(FLOAT_ITEMS.length);
-    const gap = isMobile ? 24 : STACK_GAP;
-    return {
-      stackPositions: positions,
-      chaosPanelPosition: isMobile
-        ? { x: 0, y: window.innerHeight - 44 }
-        : {
-            x: window.innerWidth / 2 - 110,
-            y:
-              positions[FLOAT_ITEMS.length - 1].y +
-              ITEM_HEIGHT_ESTIMATE +
-              gap,
-          },
-    };
-  });
+  const [stackPositions, setStackPositions] = useState(() =>
+    getStackPositions(FLOAT_ITEMS.length),
+  );
+
+  useEffect(() => {
+    const handleResize = () => setStackPositions(getStackPositions(FLOAT_ITEMS.length));
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const returnHomeRef = useRef<((onComplete?: () => void) => void) | null>(
     null,
   );
@@ -200,21 +190,18 @@ function App() {
               <h2 className={styles.bouncingText}>{item.label}</h2>
             </FloatItem>
           ))}
-          <FloatItem
-            initialPosition={chaosPanelPosition}
-            frozen={true}
-            freezeOnHover={false}
-          >
-            <ChaosPanel
-              chaosActive={chaosActive}
-              controls={CONTROLS}
-              values={controlValues}
-              onChange={handleChange}
-              onActivateChaos={handleActivateChaos}
-              onCancelChaos={handleCancelChaos}
-            />
-          </FloatItem>
         </FloatProvider>
+      </div>
+
+      <div className={styles.chaosWrapper}>
+        <ChaosPanel
+          chaosActive={chaosActive}
+          controls={CONTROLS}
+          values={controlValues}
+          onChange={handleChange}
+          onActivateChaos={handleActivateChaos}
+          onCancelChaos={handleCancelChaos}
+        />
       </div>
 
       {activeModal && activeConfig?.modal && (

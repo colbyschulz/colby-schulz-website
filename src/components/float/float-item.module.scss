@@ -9,17 +9,21 @@
 
 .inner {
   transition: transform 0.2s;
-
-  @include mobile {
-    padding: 8px 12px;
-  }
 }
 
 .clickable {
   cursor: pointer;
 
+  .inner {
+    transform: translateX(-50%);
+
+    @include mobile {
+      padding: 8px 12px;
+    }
+  }
+
   &:hover .inner {
-    transform: scale(1.05);
+    transform: translateX(-50%) scale(1.05);
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
   }
 }

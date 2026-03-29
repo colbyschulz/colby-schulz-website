@@ -9,6 +9,7 @@ export const FloatContext = createContext<FloatContextValue>({
   unregister: noop,
   setFrozen: noop,
   setSize: noop,
+  setHome: noop,
   returnHome: noop,
 });
 
@@ -85,12 +86,16 @@ export function FloatProvider({ speed, children }: FloatProviderProps) {
     engineRef.current?.setSize(id, size);
   }, []);
 
+  const setHome = useCallback((id: string, position: Vec2) => {
+    engineRef.current?.setHome(id, position);
+  }, []);
+
   const returnHome = useCallback((onComplete?: () => void) => {
     engineRef.current?.returnHome(onComplete);
   }, []);
 
   return (
-    <FloatContext value={{ register, unregister, setFrozen, setSize, returnHome }}>
+    <FloatContext value={{ register, unregister, setFrozen, setSize, setHome, returnHome }}>
       {children}
     </FloatContext>
   );

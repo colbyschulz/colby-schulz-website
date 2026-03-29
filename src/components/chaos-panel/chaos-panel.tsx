@@ -62,27 +62,45 @@ export function ChaosPanel({
       onClick={!chaosActive ? onActivateChaos : undefined}
     >
       <div className={styles.calmFace}>
+        <div className={styles.calmStripe}>
+          <div className={styles.cautionBand}>
+            {Array.from({ length: 3 }, (_, i) => (
+              <span key={i} className={styles.cautionText}>CAUTION</span>
+            ))}
+          </div>
+        </div>
         <span className={styles.calmLabel}>activate chaos mode</span>
+        <div className={styles.calmStripe}>
+          <div className={styles.cautionBand}>
+            {Array.from({ length: 3 }, (_, i) => (
+              <span key={i} className={styles.cautionText}>CAUTION</span>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className={styles.panelFace}>
-        <span className={styles.panelHeader}>Chaos Controller</span>
-        <div className={styles.controls}>
-          {controls.map((control) => {
-            if (control.type !== 'slider') return null;
-            return (
-              <SliderRow
-                key={control.key}
-                control={control}
-                value={values[control.key]}
-                onChange={(v) => onChange(control.key, v)}
-              />
-            );
-          })}
+      <div className={styles.panelFaceOuter}>
+        <div className={styles.panelFace}>
+          <div className={styles.panelFaceInner}>
+            <span className={styles.panelHeader}>Chaos Controller</span>
+            <div className={styles.controls}>
+              {controls.map((control) => {
+                if (control.type !== 'slider') return null;
+                return (
+                  <SliderRow
+                    key={control.key}
+                    control={control}
+                    value={values[control.key]}
+                    onChange={(v) => onChange(control.key, v)}
+                  />
+                );
+              })}
+            </div>
+            <button className={styles.cancelButton} onClick={onCancelChaos}>
+              please stop
+            </button>
+          </div>
         </div>
-        <button className={styles.cancelButton} onClick={onCancelChaos}>
-          Cancel Chaos
-        </button>
       </div>
     </div>
   );

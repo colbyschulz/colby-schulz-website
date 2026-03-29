@@ -12,7 +12,7 @@ export function FloatItem({
 }: FloatItemProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
-  const { register, unregister, setFrozen, setSize } = useContext(FloatContext);
+  const { register, unregister, setFrozen, setSize, setHome } = useContext(FloatContext);
 
   useEffect(() => {
     const el = ref.current;
@@ -27,6 +27,10 @@ export function FloatItem({
   useEffect(() => {
     setFrozen(id, frozen);
   }, [id, frozen, setFrozen]);
+
+  useEffect(() => {
+    if (initialPosition) setHome(id, initialPosition);
+  }, [id, initialPosition, setHome]);
 
   // Keep the engine's collision box in sync with the DOM element size.
   // Needed because some items resize (e.g. ChaosPanel expanding).

@@ -7,6 +7,15 @@
   touch-action: manipulation;
 }
 
+:global(*) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:global(button:focus) {
+  outline: none;
+  box-shadow: none;
+}
+
 .container {
   position: fixed;
   inset: 0;
@@ -24,4 +33,12 @@
   @include mobile {
     font-size: 2rem;
   }
+}
+
+.chaosWrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: $z-control-panel;
 }
