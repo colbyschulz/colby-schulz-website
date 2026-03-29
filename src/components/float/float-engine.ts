@@ -167,22 +167,22 @@ export class FloatEngine {
 
   private tickReturnHome(): Map<string, Vec2> {
     let allHome = true;
-    const lerpFactor = 0.18;
-    const snapThreshold = 0.5;
+    const speed = 12; // px per frame
 
     for (const item of this.items.values()) {
       const dx = item.homePosition.x - item.position.x;
       const dy = item.homePosition.y - item.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < snapThreshold) {
+      if (dist <= speed) {
         item.position.x = item.homePosition.x;
         item.position.y = item.homePosition.y;
         item.velocity = { x: 0, y: 0 };
       } else {
         allHome = false;
-        item.position.x += dx * lerpFactor;
-        item.position.y += dy * lerpFactor;
+        const scale = speed / dist;
+        item.position.x += dx * scale;
+        item.position.y += dy * scale;
       }
     }
 
