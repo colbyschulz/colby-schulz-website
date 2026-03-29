@@ -126,11 +126,13 @@ interface ActiveModal {
 
 const MOBILE_BREAKPOINT = 768;
 // Height estimates reflect actual SVG icon rendered heights (aspect ratio × rendered width).
-// Desktop avg ~151px across the 4 icons; mobile avg ~121px.
+// Desktop avg ~151px across the 4 icons; mobile avg ~121px + 16px touch padding = 137px.
 const ITEM_HEIGHT_ESTIMATE_DESKTOP = 151;
-const ITEM_HEIGHT_ESTIMATE_MOBILE = 121;
+const ITEM_HEIGHT_ESTIMATE_MOBILE = 137;
 const STACK_GAP_DESKTOP = 72;
-const STACK_GAP_MOBILE = 20;
+const STACK_GAP_MOBILE = 16;
+// Reserve space for the fixed chaos panel at the bottom (collapsed height).
+const CHAOS_PANEL_RESERVED = 52;
 
 function getStackPositions(count: number): Vec2[] {
   const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
@@ -138,8 +140,9 @@ function getStackPositions(count: number): Vec2[] {
     ? ITEM_HEIGHT_ESTIMATE_MOBILE
     : ITEM_HEIGHT_ESTIMATE_DESKTOP;
   const gap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
+  const usableHeight = window.innerHeight - CHAOS_PANEL_RESERVED;
   const totalHeight = count * itemHeight + (count - 1) * gap;
-  const startY = (window.innerHeight - totalHeight) / 2;
+  const startY = (usableHeight - totalHeight) / 2;
   return Array.from({ length: count }, (_, i) => ({
     x: window.innerWidth / 2,
     y: startY + i * (itemHeight + gap),
