@@ -169,6 +169,10 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   height: 20px;
   user-select: none;
   touch-action: none;
+
+  @include mobile {
+    height: 44px;
+  }
 }
 
 .sliderTrack {
