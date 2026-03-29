@@ -42,12 +42,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s;
 
-  .box[data-chaos='false'] & {
-    opacity: 1;
-    transition: opacity 0.2s 0.3s; // delay until box is mostly closed
+  .box[data-chaos='true'] & {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -70,14 +68,10 @@
   flex-direction: column;
   padding: 1.25rem;
   gap: 1rem;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s;
 
   .box[data-chaos='true'] & {
-    opacity: 1;
     pointer-events: auto;
-    transition: opacity 0.2s 0.3s; // delay until box is mostly open
   }
 }
 
