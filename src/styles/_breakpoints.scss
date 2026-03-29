@@ -3,3 +3,11 @@
     @content;
   }
 }
+
+// Only applies on devices that genuinely support hover (mouse/trackpad).
+// Prevents sticky-hover on touch devices where :hover persists after tap.
+@mixin can-hover {
+  @media (hover: hover) {
+    @content;
+  }
+}

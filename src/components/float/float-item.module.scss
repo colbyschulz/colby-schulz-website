@@ -68,9 +68,11 @@
     }
   }
 
-  &:hover .inner {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
-    animation-play-state: paused;
+  @include can-hover {
+    &:hover .inner {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+      animation-play-state: paused;
+    }
   }
 }

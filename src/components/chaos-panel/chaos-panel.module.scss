@@ -23,9 +23,11 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     background: $color-caution;
 
-    &:hover {
-      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
-      animation: jiggle 0.15s linear infinite;
+    @include can-hover {
+      &:hover {
+        filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+        animation: jiggle 0.15s linear infinite;
+      }
     }
 
     &:active {
@@ -282,8 +284,10 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
     height: 20px;
   }
 
-  &:hover {
-    background: #333;
+  @include can-hover {
+    &:hover {
+      background: #333;
+    }
   }
 
   &:focus-visible {
@@ -324,7 +328,9 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 8px;
   }
 
-  &:hover {
-    background: $color-cancel-hover;
+  @include can-hover {
+    &:hover {
+      background: $color-cancel-hover;
+    }
   }
 }

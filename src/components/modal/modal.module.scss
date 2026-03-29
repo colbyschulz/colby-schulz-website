@@ -112,7 +112,9 @@
     padding: 12px 24px;
   }
 
-  &:hover {
-    border-color: $border-hover;
+  @include can-hover {
+    &:hover {
+      border-color: $border-hover;
+    }
   }
 }

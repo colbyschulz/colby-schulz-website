@@ -1,4 +1,5 @@
 @use '@/styles/tokens' as *;
+@use '@/styles/breakpoints' as *;
 
 .fallback {
   display: flex;
@@ -27,7 +28,9 @@
   padding: 6px 16px;
   transition: border-color 0.15s;
 
-  &:hover {
-    border-color: $border-hover;
+  @include can-hover {
+    &:hover {
+      border-color: $border-hover;
+    }
   }
 }
