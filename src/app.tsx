@@ -6,6 +6,7 @@ import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ChaosPanel } from './components/chaos-panel/chaos-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
 import { Chat } from './components/chat/chat';
+import { ColbotBubble } from './components/colbot-bubble/colbot-bubble';
 import { Modal } from './components/modal/modal';
 import type { ModalOrigin } from './components/modal/modal.types';
 import type {
@@ -17,9 +18,14 @@ import type { ComponentType } from 'react';
 import type { Vec2 } from './components/float/float-types';
 import styles from './app.module.scss';
 
+export interface FloatItemContentProps {
+  label: string;
+}
+
 interface FloatItemConfig {
   key: string;
   label: string;
+  content?: ComponentType<FloatItemContentProps>;
   freezeOnHover?: boolean;
   modal?: {
     title: string;
@@ -41,14 +47,15 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     freezeOnHover: true,
   },
   {
-    key: 'conteact',
+    key: 'contact',
     label: 'Contact',
     modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
   },
   {
     key: 'chatbot',
-    label: 'Ask Colbot!',
+    label: 'ASK COL-BOT!',
+    content: ColbotBubble,
     modal: { title: 'Chat', content: Chat },
     freezeOnHover: true,
   },
@@ -208,7 +215,11 @@ function App() {
                   : undefined
               }
             >
-              <h2 className={styles.bouncingText}>{item.label}</h2>
+              {item.content ? (
+                <item.content label={item.label} />
+              ) : (
+                <h2 className={styles.floatLabel}>{item.label}</h2>
+              )}
             </FloatItem>
           ))}
         </FloatProvider>

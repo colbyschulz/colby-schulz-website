@@ -24,9 +24,12 @@
   touch-action: manipulation;
 }
 
-.bouncingText {
+.floatLabel {
+  font-family: $font-caution;
   font-size: $text-xl;
-  font-weight: $weight-light;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: $tracking-widest;
   white-space: nowrap;
   margin: 0;
 
