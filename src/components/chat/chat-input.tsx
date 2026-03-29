@@ -31,6 +31,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           disabled={disabled}
           rows={1}
           maxLength={500}
+          enterKeyHint="send"
         />
         <button
           className={styles.inputSend}
