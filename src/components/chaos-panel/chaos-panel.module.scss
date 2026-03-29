@@ -11,12 +11,6 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
 
-  @include mobile {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
-
   &[data-chaos='false'] {
     width: 220px;
     height: 44px;
@@ -27,7 +21,12 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
       height $panel-duration $panel-ease $panel-duration;
 
     @include mobile {
-      width: 100%;
+      width: 100vw;
+      // Closing: slide back down AFTER box collapses
+      transition:
+        width $panel-duration $panel-ease $panel-duration,
+        height $panel-duration $panel-ease $panel-duration,
+        transform $panel-duration $panel-ease $panel-duration;
     }
 
     &:hover {
@@ -57,7 +56,15 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
       height $panel-duration $panel-ease;
 
     @include mobile {
-      width: 100%;
+      width: 100vw;
+      // Shift up so the full 260px panel sits above the bottom edge
+      // (260px open height - 44px closed bar = 216px upward shift)
+      transform: translateY(-216px);
+      // Opening: slide up immediately
+      transition:
+        width $panel-duration $panel-ease,
+        height $panel-duration $panel-ease,
+        transform $panel-duration $panel-ease;
     }
   }
 }

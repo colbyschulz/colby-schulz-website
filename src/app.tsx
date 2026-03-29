@@ -129,7 +129,7 @@ function App() {
     return {
       stackPositions: positions,
       chaosPanelPosition: isMobile
-        ? { x: 0, y: window.innerHeight - 260 }
+        ? { x: 0, y: window.innerHeight - 44 }
         : {
             x: window.innerWidth / 2 - 110,
             y:
