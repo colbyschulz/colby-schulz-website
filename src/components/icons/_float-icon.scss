@@ -1,0 +1,83 @@
+// src/components/icons/_float-icon.scss
+//
+// Shared styles for all SVG float-item icons.
+// Each icon module @use-es this partial and composes from it.
+
+@use '@/styles/tokens' as *;
+@use '@/styles/breakpoints' as *;
+
+@keyframes glowCycle {
+  0%, 100% {
+    color: #000000;
+    text-shadow: none;
+  }
+  14.29% {
+    color: #f0c000;
+    text-shadow: 0 0 20px rgba(240, 192, 0, 0.8), 0 0 40px rgba(240, 192, 0, 0.4);
+  }
+  28.57% {
+    color: #c45e2c;
+    text-shadow: 0 0 20px rgba(196, 94, 44, 0.8), 0 0 40px rgba(196, 94, 44, 0.4);
+  }
+  42.86% {
+    color: #7a7a2e;
+    text-shadow: 0 0 20px rgba(122, 122, 46, 0.8), 0 0 40px rgba(122, 122, 46, 0.4);
+  }
+  57.14% {
+    color: #9f2214;
+    text-shadow: 0 0 20px rgba(159, 34, 20, 0.8), 0 0 40px rgba(159, 34, 20, 0.4);
+  }
+  71.43% {
+    color: #5a3b00;
+    text-shadow: 0 0 20px rgba(90, 59, 0, 0.8), 0 0 40px rgba(90, 59, 0, 0.4);
+  }
+  85.71% {
+    color: #71535c;
+    text-shadow: 0 0 20px rgba(113, 83, 92, 0.8), 0 0 40px rgba(113, 83, 92, 0.4);
+  }
+}
+
+@mixin wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin svg {
+  display: block;
+  height: auto;
+}
+
+@mixin shape {
+  stroke: $color-caution-border;
+  stroke-width: 8;
+
+  :global([data-chaos='true']) & {
+    stroke: currentColor;
+  }
+}
+
+@mixin label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: $font-caution;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: $tracking-widest;
+  color: $color-caution-border;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+
+  :global([data-chaos='true']) & {
+    animation: glowCycle linear infinite;
+    animation-duration: calc(10s / max(var(--glow-speed), 0.001));
+    animation-delay: calc(var(--stagger-index, 0) * -10s / max(var(--glow-speed), 0.001) / 4);
+  }
+
+  @include mobile {
+    font-size: 0.8rem;
+  }
+}
