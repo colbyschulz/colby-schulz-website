@@ -5,6 +5,7 @@
 
 @use '@/styles/tokens' as *;
 @use '@/styles/breakpoints' as *;
+@forward '@/styles/breakpoints';
 
 @keyframes glowCycle {
   0%, 100% {

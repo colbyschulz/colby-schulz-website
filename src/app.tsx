@@ -6,7 +6,10 @@ import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ChaosPanel } from './components/chaos-panel/chaos-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
 import { Chat } from './components/chat/chat';
-import { ColbotBubble } from './components/colbot-bubble/colbot-bubble';
+import { ColbotBubble } from './components/icons/colbot-bubble';
+import { ContactEnvelope } from './components/icons/contact-envelope';
+import { ResumeDocument } from './components/icons/resume-document';
+import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
 import type { ModalOrigin } from './components/modal/modal.types';
 import type {
@@ -37,18 +40,21 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
   {
     key: 'name',
     label: 'Colby Schulz',
+    content: NameCard,
     modal: { title: 'About', content: () => <p>About content coming soon.</p> },
     freezeOnHover: true,
   },
   {
     key: 'resume',
     label: 'Resume',
+    content: ResumeDocument,
     modal: { title: 'Resume', content: () => <p>Resume coming soon.</p> },
     freezeOnHover: true,
   },
   {
     key: 'contact',
     label: 'Contact',
+    content: ContactEnvelope,
     modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
   },
