@@ -10,7 +10,7 @@ import type { ModalOrigin } from './components/modal/modal.types';
 import type {
   Control,
   ControlValues,
-} from './components/control-panel/control-panel.types';
+} from './components/chaos-panel/chaos-panel.types';
 
 import type { ComponentType } from 'react';
 import type { Vec2 } from './components/float/float-types';
@@ -75,7 +75,7 @@ const CONTROLS: Control[] = [
 ];
 
 const CALM_VALUES: ControlValues = { grain: 0, speed: 0 };
-const CHAOS_VALUES: ControlValues = { grain: 90, speed: 2 };
+const CHAOS_VALUES: ControlValues = { grain: 120, speed: 3 };
 
 interface ActiveModal {
   key: string;
@@ -94,6 +94,11 @@ function getStackPositions(count: number): Vec2[] {
   }));
 }
 
+/**
+ * Bridge to access FloatContext.returnHome from App (which sits above
+ * FloatProvider). Renders nothing — just forwards the context method
+ * to a parent ref via onCapture so App can trigger returnHome.
+ */
 function ReturnHomeBridge({
   onCapture,
 }: {
@@ -112,6 +117,7 @@ function App() {
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
+  // Computed once on mount — no setter needed since positions are static.
   const [{ stackPositions, chaosPanelPosition }] = useState(() => {
     const positions = getStackPositions(FLOAT_ITEMS.length);
     return {

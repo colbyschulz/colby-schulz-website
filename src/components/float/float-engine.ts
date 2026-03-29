@@ -1,5 +1,14 @@
 import type { FloatingItem, Vec2, Size } from './float-types.ts';
 
+/**
+ * Frame-based physics engine for floating items. Each tick:
+ * 1. Moves items by their velocity
+ * 2. Bounces off viewport edges
+ * 3. Resolves item-item collisions (AABB)
+ *
+ * Items can be "frozen" (stationary but still collidable) or "returning"
+ * (moving at constant speed back to their home positions).
+ */
 export class FloatEngine {
   private items = new Map<string, FloatingItem>();
   private speed: number;
@@ -26,6 +35,8 @@ export class FloatEngine {
       x: Math.random() * Math.max(0, maxX),
       y: Math.random() * Math.max(0, maxY),
     };
+    // Unit vector for initial travel direction — used by setSpeed/setFrozen
+    // to recompute velocity when speed changes without losing direction.
     const angle = Math.random() * 2 * Math.PI;
     const dirX = Math.cos(angle);
     const dirY = Math.sin(angle);
@@ -97,6 +108,11 @@ export class FloatEngine {
     return this.returning;
   }
 
+  /**
+   * Brute-force AABB collision detection (O(n²)). For each overlapping
+   * pair, reverses velocity on the axis of least penetration and pushes
+   * items apart. Frozen items act as immovable walls.
+   */
   private resolveItemCollisions(): void {
     const items = Array.from(this.items.values());
     for (let i = 0; i < items.length; i++) {
@@ -166,6 +182,11 @@ export class FloatEngine {
     }
   }
 
+  /**
+   * Moves each item toward its home position at constant speed.
+   * When all items arrive, resets engine to idle (speed=0, all
+   * velocities zeroed) and fires the onReturnComplete callback.
+   */
   private tickReturnHome(): Map<string, Vec2> {
     let allHome = true;
     const speed = 24; // px per frame

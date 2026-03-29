@@ -1,5 +1,5 @@
 import * as Slider from '@radix-ui/react-slider';
-import type { Control, ControlValues } from '../control-panel/control-panel.types';
+import type { Control, ControlValues } from './chaos-panel.types';
 import styles from './chaos-panel.module.scss';
 
 interface ChaosPanelProps {

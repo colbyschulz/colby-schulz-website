@@ -28,6 +28,8 @@ export function FloatItem({
     setFrozen(id, frozen);
   }, [id, frozen, setFrozen]);
 
+  // Keep the engine's collision box in sync with the DOM element size.
+  // Needed because some items resize (e.g. ChaosPanel expanding).
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -66,6 +68,8 @@ export function FloatItem({
       onMouseLeave={handleMouseLeave}
       onClick={onClick ? handleClick : undefined}
     >
+      {/* Inner wrapper for hover scale — can't scale .item directly
+          because the engine sets its transform (translate) every frame. */}
       <div className={styles.inner}>{children}</div>
     </div>
   );
