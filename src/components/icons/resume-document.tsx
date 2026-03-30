@@ -6,7 +6,7 @@ export function ResumeDocument({ label }: FloatItemContentProps) {
   return (
     <FloatIcon
       label={label}
-      viewBox="21 11 258 332"
+      viewBox="20 10 260 334"
       className={styles.wrapper}
       svgClassName={styles.svg}
       shapeClassName={styles.shape}

@@ -15,6 +15,9 @@
 
 .shape {
   @include shape;
+  // viewBox is narrower (258 units → 140px CSS = 0.543 scale), so stroke-width
+  // needs to be 9 to render at ~5px — same visual weight as the other icons.
+  stroke-width: 9;
 }
 
 .label {
