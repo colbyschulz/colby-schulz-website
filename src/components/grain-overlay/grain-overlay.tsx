@@ -6,13 +6,23 @@ interface GrainOverlayProps {
 }
 
 const FRAME_INTERVAL = 1000 / 24; // ~41.67ms — throttle to 24fps
+// Mobile screens have fewer canvas pixels (CSS px, not device px) so we can
+// afford a baseline grain bump that's always on, independent of the slider.
+const MOBILE_GRAIN_FLOOR = 40;
+
+function getEffectiveOpacity(opacity: number): number {
+  if (window.innerWidth <= 768) {
+    return Math.max(opacity, MOBILE_GRAIN_FLOOR);
+  }
+  return opacity;
+}
 
 export function GrainOverlay({ opacity }: GrainOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const opacityRef = useRef(opacity);
+  const opacityRef = useRef(getEffectiveOpacity(opacity));
 
   useEffect(() => {
-    opacityRef.current = opacity;
+    opacityRef.current = getEffectiveOpacity(opacity);
   }, [opacity]);
 
   useEffect(() => {
