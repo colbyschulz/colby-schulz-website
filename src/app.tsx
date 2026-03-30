@@ -125,28 +125,25 @@ interface ActiveModal {
 }
 
 const MOBILE_BREAKPOINT = 768;
-// Height estimates reflect actual SVG icon rendered heights (aspect ratio × rendered width).
-// Desktop avg ~151px across the 4 icons; mobile avg ~121px + 16px touch padding = 137px.
-const ITEM_HEIGHT_ESTIMATE_DESKTOP = 151;
-const ITEM_HEIGHT_ESTIMATE_MOBILE = 137;
 const STACK_GAP_DESKTOP = 72;
 const STACK_GAP_MOBILE = 16;
-// Reserve space for the fixed chaos panel at the bottom (collapsed height).
-const CHAOS_PANEL_RESERVED = 52;
 
-function getStackPositions(count: number): Vec2[] {
+function computeStackPositions(
+  items: FloatItemConfig[],
+  heights: Record<string, number>,
+): Vec2[] {
   const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const itemHeight = isMobile
-    ? ITEM_HEIGHT_ESTIMATE_MOBILE
-    : ITEM_HEIGHT_ESTIMATE_DESKTOP;
   const gap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
-  const usableHeight = window.innerHeight - CHAOS_PANEL_RESERVED;
-  const totalHeight = count * itemHeight + (count - 1) * gap;
-  const startY = (usableHeight - totalHeight) / 2;
-  return Array.from({ length: count }, (_, i) => ({
-    x: window.innerWidth / 2,
-    y: startY + i * (itemHeight + gap),
-  }));
+  const totalHeight =
+    items.reduce((sum, item) => sum + (heights[item.key] ?? 0), 0) +
+    (items.length - 1) * gap;
+  const startY = (window.innerHeight - totalHeight) / 2;
+  let y = startY;
+  return items.map((item) => {
+    const pos = { x: window.innerWidth / 2, y };
+    y += (heights[item.key] ?? 0) + gap;
+    return pos;
+  });
 }
 
 function App() {
@@ -155,16 +152,39 @@ function App() {
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
-  const [stackPositions, setStackPositions] = useState(() =>
-    getStackPositions(FLOAT_ITEMS.length),
+  // Measured heights reported by each FloatItem's ResizeObserver.
+  // Using a ref avoids re-renders during measurement; state update fires once all are in.
+  const measuredHeightsRef = useRef<Record<string, number>>({});
+  const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
+    // Rough fallback until ResizeObserver fires — items snap to measured positions
+    // on the first paint since speed=0 in calm mode.
+    FLOAT_ITEMS.map((_, i) => ({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2 + (i - FLOAT_ITEMS.length / 2) * 160,
+    })),
   );
 
+  const handleItemSizeChange = useCallback((key: string, height: number) => {
+    measuredHeightsRef.current[key] = height;
+    if (FLOAT_ITEMS.every((item) => item.key in measuredHeightsRef.current)) {
+      setStackPositions(
+        computeStackPositions(FLOAT_ITEMS, measuredHeightsRef.current),
+      );
+    }
+  }, []);
+
   useEffect(() => {
-    const handleResize = () =>
-      setStackPositions(getStackPositions(FLOAT_ITEMS.length));
+    const handleResize = () => {
+      if (FLOAT_ITEMS.every((item) => item.key in measuredHeightsRef.current)) {
+        setStackPositions(
+          computeStackPositions(FLOAT_ITEMS, measuredHeightsRef.current),
+        );
+      }
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
   const floatProviderRef = useRef<FloatProviderHandle>(null);
 
   const handleChange = useCallback((key: string, value: number) => {
@@ -225,6 +245,7 @@ function App() {
               frozen={frozenKey === item.key}
               chaosActive={chaosActive}
               staggerIndex={i}
+              onSizeChange={(height) => handleItemSizeChange(item.key, height)}
               onClick={
                 item.modal
                   ? (origin) => handleItemClick(item.key, origin)
