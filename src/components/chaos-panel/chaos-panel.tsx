@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import type { Control, ControlValues } from './chaos-panel.types';
-import { MaxPowerButton } from './max-power-button/max-power-button';
-import { PleaseStopButton } from './please-stop-button/please-stop-button';
+import { PanelActionButton } from './panel-action-button/panel-action-button';
 import styles from './chaos-panel.module.scss';
 
 interface ChaosPanelProps {
@@ -120,8 +119,8 @@ export function ChaosPanel({
               })}
             </div>
             <div className={styles.panelActions}>
-              <MaxPowerButton onClick={onMaxPower} />
-              <PleaseStopButton onClick={onCancelChaos} />
+              <PanelActionButton label="max power!!" color="green" onClick={onMaxPower} />
+              <PanelActionButton label="stop" color="red" onClick={onCancelChaos} />
             </div>
           </div>
         </div>
