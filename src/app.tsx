@@ -127,20 +127,40 @@ interface ActiveModal {
 const MOBILE_BREAKPOINT = 768;
 const STACK_GAP_DESKTOP = 90;
 const STACK_GAP_MOBILE = 40;
+const STACK_MARGIN = 16; // minimum px from viewport top edge
+const CHAOS_PANEL_RESERVED = 48; // collapsed panel: 44px min-height + 2×2px border
+
+function getViewportSize() {
+  // visualViewport accounts for iOS Safari browser chrome (address/tab bars).
+  // Falls back to innerWidth/Height for environments that don't support it.
+  return {
+    width: window.visualViewport?.width ?? window.innerWidth,
+    height: window.visualViewport?.height ?? window.innerHeight,
+  };
+}
 
 function computeStackPositions(
   items: FloatItemConfig[],
   heights: Record<string, number>,
 ): Vec2[] {
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-  const gap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
-  const totalHeight =
-    items.reduce((sum, item) => sum + (heights[item.key] ?? 0), 0) +
-    (items.length - 1) * gap;
-  const startY = (window.innerHeight - totalHeight) / 2;
+  const { width, height } = getViewportSize();
+  const isMobile = width <= MOBILE_BREAKPOINT;
+  const preferredGap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
+  const usableHeight = height - CHAOS_PANEL_RESERVED - STACK_MARGIN;
+  const totalItemHeight = items.reduce(
+    (sum, item) => sum + (heights[item.key] ?? 0),
+    0,
+  );
+  // Cap gap so the full stack never exceeds usable height.
+  const gap = Math.max(
+    0,
+    Math.min(preferredGap, (usableHeight - totalItemHeight) / (items.length - 1)),
+  );
+  const totalHeight = totalItemHeight + (items.length - 1) * gap;
+  const startY = Math.max(STACK_MARGIN, (usableHeight - totalHeight) / 2 + STACK_MARGIN);
   let y = startY;
   return items.map((item) => {
-    const pos = { x: window.innerWidth / 2, y };
+    const pos = { x: width / 2, y };
     y += (heights[item.key] ?? 0) + gap;
     return pos;
   });
@@ -182,7 +202,13 @@ function App() {
       }
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // iOS Safari fires visualViewport resize when browser chrome shows/hides,
+    // which changes the available height without triggering window resize.
+    window.visualViewport?.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const floatProviderRef = useRef<FloatProviderHandle>(null);
