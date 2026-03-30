@@ -63,10 +63,11 @@ export function ChaosPanel({
   const [collapsed, setCollapsed] = useState(false);
   const [prevChaosActive, setPrevChaosActive] = useState(chaosActive);
 
-  // Reset collapsed state when chaos deactivates (render-time derived state)
+  // When chaos activates, start collapsed so the user sees the full chaos first;
+  // when chaos deactivates, reset to non-collapsed for the calm face.
   if (prevChaosActive !== chaosActive) {
     setPrevChaosActive(chaosActive);
-    if (!chaosActive) setCollapsed(false);
+    setCollapsed(chaosActive);
   }
 
   return (

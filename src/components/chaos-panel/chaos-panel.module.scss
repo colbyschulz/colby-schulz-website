@@ -6,10 +6,10 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 @keyframes jiggle {
   0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(-1px, 0.5px) rotate(-0.25deg); }
-  50% { transform: translate(1px, -0.5px) rotate(0.25deg); }
-  75% { transform: translate(-0.5px, -0.5px) rotate(-0.15deg); }
-  100% { transform: translate(0.5px, 0.5px) rotate(0.15deg); }
+  25% { transform: translate(-1.5px, 0.75px) rotate(-0.35deg); }
+  50% { transform: translate(1.5px, -0.75px) rotate(0.35deg); }
+  75% { transform: translate(-0.75px, -0.75px) rotate(-0.2deg); }
+  100% { transform: translate(0.75px, 0.75px) rotate(0.2deg); }
 }
 
 .box {
@@ -62,8 +62,8 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   .box[data-chaos='true'] & {
     opacity: 0;
     pointer-events: none;
-    // Opening: hide instantly
-    transition: none;
+    // Opening: fade out the calm face
+    transition: opacity $panel-duration $panel-ease;
   }
 }
 
@@ -139,7 +139,9 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
 // ─── Panel tab ───────────────────────────────────────────────────────────────
 
 .panelTab {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   position: absolute;
   bottom: 100%;
   left: 1rem;
@@ -156,11 +158,13 @@ $panel-ease: cubic-bezier(0.4, 0, 0.2, 1);
   color: $color-caution-border;
   user-select: none;
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $panel-duration $panel-ease;
 
   .box[data-chaos='true'] & {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
