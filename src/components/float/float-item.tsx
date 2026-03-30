@@ -10,13 +10,10 @@ export function FloatItem({
   chaosActive = false,
   staggerIndex,
   onClick,
-  onSizeChange,
   children,
 }: FloatItemProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
-  const onSizeChangeRef = useRef(onSizeChange);
-  onSizeChangeRef.current = onSizeChange;
   const { register, unregister, setFrozen, setSize, setHome } = useContext(FloatContext);
 
   useEffect(() => {
@@ -47,7 +44,6 @@ export function FloatItem({
       if (!entry) return;
       const { width, height } = entry.contentRect;
       setSize(id, { width, height });
-      onSizeChangeRef.current?.(height);
     });
     observer.observe(el);
     return () => observer.disconnect();

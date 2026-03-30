@@ -50,6 +50,5 @@ export interface FloatItemProps {
   chaosActive?: boolean;
   staggerIndex?: number;
   onClick?: (origin: Vec2) => void;
-  onSizeChange?: (height: number) => void;
   children: ReactNode;
 }

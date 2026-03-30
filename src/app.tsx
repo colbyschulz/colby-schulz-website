@@ -34,6 +34,9 @@ interface FloatItemConfig {
     title: string;
     content: ComponentType;
   };
+  // Pixel heights per breakpoint: SVG aspect ratio × CSS width + touch padding where applicable.
+  // Must be updated if icon CSS widths change.
+  heights: { desktop: number; mobile: number };
 }
 
 const FLOAT_ITEMS: FloatItemConfig[] = [
@@ -43,6 +46,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: NameCard,
     modal: { title: 'About', content: () => <p>About content coming soon.</p> },
     freezeOnHover: true,
+    // 260 × 188/368 = 133px desktop; 175 × 188/368 + 16px padding = 105px mobile
+    heights: { desktop: 133, mobile: 105 },
   },
   {
     key: 'resume',
@@ -50,6 +55,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: ResumeDocument,
     modal: { title: 'Resume', content: () => <p>Resume coming soon.</p> },
     freezeOnHover: true,
+    // 140 × 334/260 = 180px desktop; 95 × 334/260 + 16px padding = 138px mobile
+    heights: { desktop: 180, mobile: 138 },
   },
   {
     key: 'contact',
@@ -57,6 +64,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: ContactEnvelope,
     modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
+    // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
+    heights: { desktop: 122, mobile: 99 },
   },
   {
     key: 'chatbot',
@@ -64,6 +73,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: ColbotBubble,
     modal: { title: 'Chat', content: Chat },
     freezeOnHover: true,
+    // 200 × 271/320 = 169px desktop; 130 × 271/320 + 16px padding = 126px mobile
+    heights: { desktop: 169, mobile: 126 },
   },
 ];
 
@@ -139,16 +150,13 @@ function getViewportSize() {
   };
 }
 
-function computeStackPositions(
-  items: FloatItemConfig[],
-  heights: Record<string, number>,
-): Vec2[] {
+function computeStackPositions(items: FloatItemConfig[]): Vec2[] {
   const { width, height } = getViewportSize();
   const isMobile = width <= MOBILE_BREAKPOINT;
   const preferredGap = isMobile ? STACK_GAP_MOBILE : STACK_GAP_DESKTOP;
   const usableHeight = height - CHAOS_PANEL_RESERVED - STACK_MARGIN;
   const totalItemHeight = items.reduce(
-    (sum, item) => sum + (heights[item.key] ?? 0),
+    (sum, item) => sum + (isMobile ? item.heights.mobile : item.heights.desktop),
     0,
   );
   // Cap gap so the full stack never exceeds usable height.
@@ -161,7 +169,7 @@ function computeStackPositions(
   let y = startY;
   return items.map((item) => {
     const pos = { x: width / 2, y };
-    y += (heights[item.key] ?? 0) + gap;
+    y += (isMobile ? item.heights.mobile : item.heights.desktop) + gap;
     return pos;
   });
 }
@@ -172,35 +180,12 @@ function App() {
     useState<ControlValues>(CALM_VALUES);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
-  // Measured heights reported by each FloatItem's ResizeObserver.
-  // Using a ref avoids re-renders during measurement; state update fires once all are in.
-  const measuredHeightsRef = useRef<Record<string, number>>({});
   const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
-    // Rough fallback until ResizeObserver fires — items snap to measured positions
-    // on the first paint since speed=0 in calm mode.
-    FLOAT_ITEMS.map((_, i) => ({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2 + (i - FLOAT_ITEMS.length / 2) * 160,
-    })),
+    computeStackPositions(FLOAT_ITEMS),
   );
 
-  const handleItemSizeChange = useCallback((key: string, height: number) => {
-    measuredHeightsRef.current[key] = height;
-    if (FLOAT_ITEMS.every((item) => item.key in measuredHeightsRef.current)) {
-      setStackPositions(
-        computeStackPositions(FLOAT_ITEMS, measuredHeightsRef.current),
-      );
-    }
-  }, []);
-
   useEffect(() => {
-    const handleResize = () => {
-      if (FLOAT_ITEMS.every((item) => item.key in measuredHeightsRef.current)) {
-        setStackPositions(
-          computeStackPositions(FLOAT_ITEMS, measuredHeightsRef.current),
-        );
-      }
-    };
+    const handleResize = () => setStackPositions(computeStackPositions(FLOAT_ITEMS));
     window.addEventListener('resize', handleResize);
     // iOS Safari fires visualViewport resize when browser chrome shows/hides,
     // which changes the available height without triggering window resize.
@@ -271,7 +256,6 @@ function App() {
               frozen={frozenKey === item.key}
               chaosActive={chaosActive}
               staggerIndex={i}
-              onSizeChange={(height) => handleItemSizeChange(item.key, height)}
               onClick={
                 item.modal
                   ? (origin) => handleItemClick(item.key, origin)
