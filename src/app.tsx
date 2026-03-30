@@ -46,8 +46,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: NameCard,
     modal: { title: 'About', content: () => <p>About content coming soon.</p> },
     freezeOnHover: true,
-    // 260 × 188/368 = 133px desktop; 175 × 188/368 + 16px padding = 105px mobile
-    heights: { desktop: 133, mobile: 105 },
+    // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
+    heights: { desktop: 112, mobile: 93 },
   },
   {
     key: 'resume',
@@ -73,8 +73,8 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     content: ColbotBubble,
     modal: { title: 'Chat', content: Chat },
     freezeOnHover: true,
-    // 200 × 271/320 = 169px desktop; 130 × 271/320 + 16px padding = 126px mobile
-    heights: { desktop: 169, mobile: 126 },
+    // 220 × 271/320 = 186px desktop; 150 × 271/320 + 16px padding = 143px mobile
+    heights: { desktop: 186, mobile: 143 },
   },
 ];
 

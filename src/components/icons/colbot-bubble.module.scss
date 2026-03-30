@@ -6,11 +6,11 @@
 
 .svg {
   @include svg;
-  width: 200px;
+  width: 220px;
   transform: scaleX(-1);
 
   @include mobile {
-    width: 130px;
+    width: 150px;
   }
 }
 

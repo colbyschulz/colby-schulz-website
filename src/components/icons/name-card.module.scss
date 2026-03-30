@@ -6,25 +6,21 @@
 
 .svg {
   @include svg;
-  width: 260px;
+  width: 220px;
 
   @include mobile {
-    width: 175px;
+    width: 150px;
   }
 }
 
 .shape {
   @include shape;
-  // viewBox is wider (368 units → 260px CSS = 0.707 scale), so stroke-width
-  // needs to be 7 to render at ~5px — same visual weight as the other icons.
-  stroke-width: 7;
 }
 
 .label {
   @include label;
   top: 58%;
   left: 65%;
-  font-size: 0.95rem;
   white-space: normal;
   text-align: center;
   max-width: 45%;
