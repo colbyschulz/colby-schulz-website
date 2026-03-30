@@ -125,8 +125,8 @@ interface ActiveModal {
 }
 
 const MOBILE_BREAKPOINT = 768;
-const STACK_GAP_DESKTOP = 72;
-const STACK_GAP_MOBILE = 16;
+const STACK_GAP_DESKTOP = 90;
+const STACK_GAP_MOBILE = 40;
 
 function computeStackPositions(
   items: FloatItemConfig[],
