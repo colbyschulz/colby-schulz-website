@@ -7,10 +7,6 @@ Name: Colby Schulz
 - Grew up in Coal Valley, Illinois, a small town of approximately 2,000 people.
 - Childhood activities: soccer, inline speed skating (competitive team), boys choir.
 - Holds a black belt in Tae Kwon Do.
-
-## Middle School
-
-- Began listening to bands like Deftones, Metallica, and Blink-182.
 - Started playing guitar.
 
 ## High School
