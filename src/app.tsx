@@ -5,8 +5,8 @@ import { FloatItem } from './components/float/float-item';
 import { GrainOverlay } from './components/grain-overlay/grain-overlay';
 import { ChaosPanel } from './components/chaos-panel/chaos-panel';
 import { ErrorBoundary } from './components/error-boundary/error-boundary';
-import { Chat } from './components/chat/chat';
-import { ColbotBubble } from './components/icons/colbot-bubble';
+// import { Chat } from './components/chat/chat';
+// import { ColbotBubble } from './components/icons/colbot-bubble';
 import { ContactEnvelope } from './components/icons/contact-envelope';
 import { ResumeDocument } from './components/icons/resume-document';
 import { NameCard } from './components/icons/name-card';
@@ -67,15 +67,15 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
   },
-  {
-    key: 'chatbot',
-    label: 'ASK COL-BOT!',
-    content: ColbotBubble,
-    modal: { title: 'Chat', content: Chat },
-    freezeOnHover: true,
-    // 220 × 271/320 = 186px desktop; 150 × 271/320 + 16px padding = 143px mobile
-    heights: { desktop: 186, mobile: 143 },
-  },
+  // {
+  //   key: 'chatbot',
+  //   label: 'ASK COL-BOT!',
+  //   content: ColbotBubble,
+  //   modal: { title: 'Chat', content: Chat },
+  //   freezeOnHover: true,
+  //   // 220 × 271/320 = 186px desktop; 150 × 271/320 + 16px padding = 143px mobile
+  //   heights: { desktop: 186, mobile: 143 },
+  // },
 ];
 
 const CONTROLS: Control[] = [
