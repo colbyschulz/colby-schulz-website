@@ -14,6 +14,7 @@ import { Modal } from './components/modal/modal';
 import type { OpenAnimation, RevealTransitionProps } from './components/reveal/reveal-types.ts';
 import { PageFanTransition } from './components/reveal/page-fan-transition';
 import { EnvelopeTransition } from './components/reveal/envelope-transition';
+import { CardFlipTransition } from './components/reveal/card-flip-transition';
 import { ResumePdfViewer } from './components/resume-viewer/resume-pdf-viewer';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
@@ -44,9 +45,10 @@ interface FloatItemConfig {
   heights: { desktop: number; mobile: number };
 }
 
-const REVEAL_TRANSITIONS: Partial<Record<OpenAnimation, ComponentType<RevealTransitionProps>>> = {
+const REVEAL_TRANSITIONS: Record<OpenAnimation, ComponentType<RevealTransitionProps>> = {
   pages: PageFanTransition,
   envelope: EnvelopeTransition,
+  flip: CardFlipTransition,
 };
 
 const FLOAT_ITEMS: FloatItemConfig[] = [
@@ -54,7 +56,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'name',
     label: 'Colby Schulz',
     content: NameCard,
-    modal: { title: 'About', content: () => <p>About content coming soon.</p> },
+    modal: { title: 'About', content: () => <p>About content coming soon.</p>, openAnimation: 'flip' },
     freezeOnHover: true,
     // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
     heights: { desktop: 112, mobile: 93 },
