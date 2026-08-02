@@ -61,8 +61,10 @@ export function FloatItem({
     if (!onClick || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     onClick({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
     });
   };
 

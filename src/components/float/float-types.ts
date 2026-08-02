@@ -10,6 +10,13 @@ export interface Size {
   height: number;
 }
 
+export interface FloatItemOrigin {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 export interface FloatingItem {
   id: string;
   position: Vec2;
@@ -49,6 +56,6 @@ export interface FloatItemProps {
   frozen?: boolean;
   chaosActive?: boolean;
   staggerIndex?: number;
-  onClick?: (origin: Vec2) => void;
+  onClick?: (origin: FloatItemOrigin) => void;
   children: ReactNode;
 }
