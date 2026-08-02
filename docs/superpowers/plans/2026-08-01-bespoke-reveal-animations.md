@@ -489,12 +489,10 @@ export function useRevealOrchestration() {
   );
 
   const finishReveal = useCallback(() => {
-    setRevealing((current) => {
-      if (!current) return current;
-      setActiveModal({ key: current.key, origin: centerOf(current.rect) });
-      return null;
-    });
-  }, []);
+    if (!revealing) return;
+    setActiveModal({ key: revealing.key, origin: centerOf(revealing.rect) });
+    setRevealing(null);
+  }, [revealing]);
 
   const closeModal = useCallback(() => setActiveModal(null), []);
 
