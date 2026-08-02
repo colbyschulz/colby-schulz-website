@@ -12,6 +12,8 @@ import { ResumeDocument } from './components/icons/resume-document';
 import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
 import { ResumeStage } from './components/resume-viewer/resume-stage';
+import { AboutContent } from './components/about-content/about-content';
+import { ContactContent } from './components/contact-content/contact-content';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -46,7 +48,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'name',
     label: 'Colby Schulz',
     content: NameCard,
-    modal: { title: 'About', buttonText: "got it", content: () => <p>About content coming soon.</p> },
+    modal: { title: 'About', buttonText: "got it", content: AboutContent },
     freezeOnHover: true,
     // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
     heights: { desktop: 112, mobile: 93 },
@@ -64,7 +66,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', buttonText: "talk soon", content: () => <p>Contact coming soon.</p> },
+    modal: { title: 'Contact', buttonText: "talk soon", content: ContactContent },
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
