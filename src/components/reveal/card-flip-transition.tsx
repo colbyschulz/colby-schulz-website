@@ -2,8 +2,10 @@ import type { RevealTransitionProps } from './reveal-types.ts';
 import { useExpandOnMount } from './use-expand-on-mount.ts';
 import styles from './card-flip-transition.module.scss';
 
+const FLOURISH_MS = 300;
+
 export function CardFlipTransition({ origin, onDone }: RevealTransitionProps) {
-  const { expanded, style } = useExpandOnMount(origin);
+  const { flourishing, expanded, style } = useExpandOnMount(origin, FLOURISH_MS);
 
   return (
     <div
@@ -13,7 +15,7 @@ export function CardFlipTransition({ origin, onDone }: RevealTransitionProps) {
         if (e.propertyName === 'width') onDone();
       }}
     >
-      <div className={`${styles.card}${expanded ? ` ${styles.cardFlipped}` : ''}`} />
+      <div className={`${styles.card}${flourishing ? ` ${styles.cardFlipped}` : ''}`} />
     </div>
   );
 }

@@ -44,10 +44,10 @@
   border: 1px solid $border-default;
   border-radius: 16px 16px 0 0;
   transform-origin: top center;
-  transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
-.expanded .flap {
+.flap.open {
   transform: rotateX(-170deg);
   opacity: 0;
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { CardFlipTransition } from '../card-flip-transition';
 
 const ORIGIN = { left: 10, top: 20, width: 100, height: 50 };
@@ -32,5 +32,19 @@ describe('CardFlipTransition', () => {
     fireEvent(stage, transitionEndEvent('opacity'));
 
     expect(onDone).not.toHaveBeenCalled();
+  });
+
+  it('flips the card (the flourish) before the stage grows', async () => {
+    const { container } = render(<CardFlipTransition origin={ORIGIN} onDone={vi.fn()} />);
+    const stage = container.firstChild as HTMLElement;
+    const card = stage.querySelector('div')!;
+
+    expect(card.className).not.toMatch(/cardFlipped/);
+    expect(stage.className).not.toMatch(/expanded/);
+
+    await waitFor(() => expect(card.className).toMatch(/cardFlipped/));
+
+    // The flip finishes well before the stage starts growing to full size.
+    expect(stage.className).not.toMatch(/expanded/);
   });
 });

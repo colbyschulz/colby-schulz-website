@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { EnvelopeTransition } from '../envelope-transition';
 
 const ORIGIN = { left: 10, top: 20, width: 100, height: 50 };
@@ -32,5 +32,19 @@ describe('EnvelopeTransition', () => {
     fireEvent(panel, transitionEndEvent('opacity'));
 
     expect(onDone).not.toHaveBeenCalled();
+  });
+
+  it('opens the flap (the flourish) before the panel grows', async () => {
+    const { container } = render(<EnvelopeTransition origin={ORIGIN} onDone={vi.fn()} />);
+    const panel = container.firstChild as HTMLElement;
+    const flap = panel.querySelector('div:last-child')!;
+
+    expect(flap.className).not.toMatch(/open/);
+    expect(panel.className).not.toMatch(/expanded/);
+
+    await waitFor(() => expect(flap.className).toMatch(/open/));
+
+    // The flap finishes opening well before the panel starts growing to full size.
+    expect(panel.className).not.toMatch(/expanded/);
   });
 });

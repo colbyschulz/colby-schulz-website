@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import { PageFanTransition } from '../page-fan-transition';
 
 const ORIGIN = { left: 10, top: 20, width: 100, height: 50 };
@@ -32,5 +32,19 @@ describe('PageFanTransition', () => {
     fireEvent(panel, transitionEndEvent('opacity'));
 
     expect(onDone).not.toHaveBeenCalled();
+  });
+
+  it('settles the pages (the flourish) before the panel grows', async () => {
+    const { container } = render(<PageFanTransition origin={ORIGIN} onDone={vi.fn()} />);
+    const panel = container.firstChild as HTMLElement;
+    const pageBehind = panel.querySelector('div')!;
+
+    expect(pageBehind.className).not.toMatch(/settled/);
+    expect(panel.className).not.toMatch(/expanded/);
+
+    await waitFor(() => expect(pageBehind.className).toMatch(/settled/));
+
+    // The flourish settles well before the panel starts growing to full size.
+    expect(panel.className).not.toMatch(/expanded/);
   });
 });

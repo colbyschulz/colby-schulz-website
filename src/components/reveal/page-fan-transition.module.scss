@@ -33,8 +33,8 @@
   border: 1px solid $border-default;
   border-radius: 16px;
   transition:
-    transform 0.35s ease-out,
-    opacity 0.35s ease-out;
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out;
 }
 
 .pageBehind {
@@ -42,7 +42,7 @@
   opacity: 0.6;
 }
 
-.expanded .pageBehind {
+.pageBehind.settled {
   transform: rotate(0deg) scale(1);
   opacity: 0;
 }

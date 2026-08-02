@@ -34,9 +34,9 @@
   border: 1px solid $border-default;
   border-radius: 16px;
   transform: rotateY(0deg);
-  transition: transform 0.35s ease-out;
+  transition: transform 0.3s ease-out;
 }
 
-.cardFlipped {
+.card.cardFlipped {
   transform: rotateY(180deg);
 }
