@@ -64,7 +64,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'name',
     label: 'Colby Schulz',
     content: NameCard,
-    modal: { title: 'About', content: () => <p>About content coming soon.</p>, openAnimation: 'flip' },
+    modal: { title: 'About', content: () => <p>About content coming soon.</p>, openAnimation: 'pages' },
     freezeOnHover: true,
     // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
     heights: { desktop: 112, mobile: 93 },
@@ -82,7 +82,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p>, openAnimation: 'envelope' },
+    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p>, openAnimation: 'pages' },
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
