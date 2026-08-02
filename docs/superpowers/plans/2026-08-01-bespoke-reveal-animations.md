@@ -516,21 +516,93 @@ git commit -m "feat: add prefers-reduced-motion and reveal-orchestration hooks"
 
 ---
 
-### Task 4: Page-fan transition component
+### Task 4: Shared expand-on-mount hook + page-fan transition component
 
-The bespoke reveal for Resume: the document's pages fan open, growing from the clicked icon's rect to the Modal's own target size/position (~90vw x 85dvh, centered) so the handoff to Modal is seamless.
+The bespoke reveal for Resume: the document's pages fan open, growing from the clicked icon's rect to the Modal's own target size/position (~90vw x 85dvh, centered) so the handoff to Modal is seamless. This is also the first of three transition components (Tasks 4, 7, 9), so it introduces a shared `useExpandOnMount` hook for the "am I expanded yet, and what inline style follows from that" logic every transition component needs — each component still owns its own bespoke markup/CSS on top of it.
 
 **Files:**
 - Create: `src/components/reveal/reveal-types.ts`
+- Create: `src/components/reveal/use-expand-on-mount.ts`
+- Create: `src/components/reveal/__tests__/use-expand-on-mount.test.ts`
 - Create: `src/components/reveal/page-fan-transition.tsx`
 - Create: `src/components/reveal/page-fan-transition.module.scss`
 - Test: `src/components/reveal/__tests__/page-fan-transition.test.tsx`
 
 **Interfaces:**
 - Consumes: `FloatItemOrigin` from `../float/float-types.ts` (Task 2).
-- Produces: `OpenAnimation = 'flip' | 'envelope' | 'pages'` and `RevealTransitionProps { origin: FloatItemOrigin; onDone: () => void }`, both exported from `reveal-types.ts` (shared by every transition component in this and later tasks). `PageFanTransition(props: RevealTransitionProps)`.
+- Produces:
+  - `OpenAnimation = 'flip' | 'envelope' | 'pages'` and `RevealTransitionProps { origin: FloatItemOrigin; onDone: () => void }`, both exported from `reveal-types.ts` (shared by every transition component in this and later tasks).
+  - `useExpandOnMount(origin: FloatItemOrigin): { expanded: boolean; style: { left: number; top: number; width: number; height: number } | undefined }`, exported from `use-expand-on-mount.ts`. `style` is the origin rect while collapsed, `undefined` once expanded (letting CSS classes take over sizing). Reused verbatim by Tasks 7 and 9.
+  - `PageFanTransition(props: RevealTransitionProps)`.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing test for `useExpandOnMount`**
+
+Create `src/components/reveal/__tests__/use-expand-on-mount.test.ts`:
+
+```ts
+import { describe, it, expect } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import { useExpandOnMount } from '../use-expand-on-mount.ts';
+
+const ORIGIN = { left: 10, top: 20, width: 100, height: 50 };
+
+describe('useExpandOnMount', () => {
+  it('starts collapsed with an inline style matching the origin rect', () => {
+    const { result } = renderHook(() => useExpandOnMount(ORIGIN));
+
+    expect(result.current.expanded).toBe(false);
+    expect(result.current.style).toEqual(ORIGIN);
+  });
+
+  it('expands after mount and clears the inline style', async () => {
+    const { result } = renderHook(() => useExpandOnMount(ORIGIN));
+
+    await waitFor(() => expect(result.current.expanded).toBe(true));
+
+    expect(result.current.style).toBeUndefined();
+  });
+});
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `npx vitest run src/components/reveal/__tests__/use-expand-on-mount.test.ts`
+Expected: FAIL — module doesn't exist
+
+- [ ] **Step 3: Implement `useExpandOnMount`**
+
+Create `src/components/reveal/use-expand-on-mount.ts`:
+
+```ts
+import { useEffect, useState } from 'react';
+import type { FloatItemOrigin } from '../float/float-types.ts';
+
+export interface ExpandOnMountResult {
+  expanded: boolean;
+  style: FloatItemOrigin | undefined;
+}
+
+export function useExpandOnMount(origin: FloatItemOrigin): ExpandOnMountResult {
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setExpanded(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  return {
+    expanded,
+    style: expanded ? undefined : origin,
+  };
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `npx vitest run src/components/reveal/__tests__/use-expand-on-mount.test.ts`
+Expected: PASS
+
+- [ ] **Step 5: Write the failing test for `PageFanTransition`**
 
 Create `src/components/reveal/__tests__/page-fan-transition.test.tsx`:
 
@@ -573,12 +645,12 @@ describe('PageFanTransition', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 6: Run test to verify it fails**
 
 Run: `npx vitest run src/components/reveal/__tests__/page-fan-transition.test.tsx`
 Expected: FAIL — module doesn't exist
 
-- [ ] **Step 3: Add the shared reveal types**
+- [ ] **Step 7: Add the shared reveal types**
 
 Create `src/components/reveal/reveal-types.ts`:
 
@@ -593,31 +665,17 @@ export interface RevealTransitionProps {
 }
 ```
 
-- [ ] **Step 4: Implement `PageFanTransition`**
+- [ ] **Step 8: Implement `PageFanTransition`**
 
 Create `src/components/reveal/page-fan-transition.tsx`:
 
 ```tsx
-import { useEffect, useState } from 'react';
 import type { RevealTransitionProps } from './reveal-types.ts';
+import { useExpandOnMount } from './use-expand-on-mount.ts';
 import styles from './page-fan-transition.module.scss';
 
 export function PageFanTransition({ origin, onDone }: RevealTransitionProps) {
-  const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setExpanded(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const style = expanded
-    ? undefined
-    : {
-        left: origin.left,
-        top: origin.top,
-        width: origin.width,
-        height: origin.height,
-      };
+  const { expanded, style } = useExpandOnMount(origin);
 
   return (
     <div
@@ -681,16 +739,16 @@ Create `src/components/reveal/page-fan-transition.module.scss`:
 }
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [ ] **Step 9: Run test to verify it passes**
 
 Run: `npx vitest run src/components/reveal/__tests__/page-fan-transition.test.tsx`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add src/components/reveal/reveal-types.ts src/components/reveal/page-fan-transition.tsx src/components/reveal/page-fan-transition.module.scss src/components/reveal/__tests__/page-fan-transition.test.tsx
-git commit -m "feat: add page-fan reveal transition for the Resume item"
+git add src/components/reveal/reveal-types.ts src/components/reveal/use-expand-on-mount.ts src/components/reveal/page-fan-transition.tsx src/components/reveal/page-fan-transition.module.scss src/components/reveal/__tests__/
+git commit -m "feat: add useExpandOnMount hook and page-fan reveal transition for Resume"
 ```
 
 ---
@@ -1132,7 +1190,7 @@ The bespoke reveal for Contact: the envelope's flap opens like a letter, while t
 - Test: `src/components/reveal/__tests__/envelope-transition.test.tsx`
 
 **Interfaces:**
-- Consumes: `RevealTransitionProps` from `./reveal-types.ts` (Task 4).
+- Consumes: `RevealTransitionProps` from `./reveal-types.ts` and `useExpandOnMount` from `./use-expand-on-mount.ts` (both Task 4).
 - Produces: `EnvelopeTransition(props: RevealTransitionProps)`.
 
 - [ ] **Step 1: Write the failing test**
@@ -1188,26 +1246,12 @@ Expected: FAIL — module doesn't exist
 Create `src/components/reveal/envelope-transition.tsx`:
 
 ```tsx
-import { useEffect, useState } from 'react';
 import type { RevealTransitionProps } from './reveal-types.ts';
+import { useExpandOnMount } from './use-expand-on-mount.ts';
 import styles from './envelope-transition.module.scss';
 
 export function EnvelopeTransition({ origin, onDone }: RevealTransitionProps) {
-  const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setExpanded(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const style = expanded
-    ? undefined
-    : {
-        left: origin.left,
-        top: origin.top,
-        width: origin.width,
-        height: origin.height,
-      };
+  const { expanded, style } = useExpandOnMount(origin);
 
   return (
     <div
@@ -1375,7 +1419,7 @@ The bespoke reveal for Name: the card flips over (3D rotateY) while growing to t
 - Test: `src/components/reveal/__tests__/card-flip-transition.test.tsx`
 
 **Interfaces:**
-- Consumes: `RevealTransitionProps` from `./reveal-types.ts` (Task 4).
+- Consumes: `RevealTransitionProps` from `./reveal-types.ts` and `useExpandOnMount` from `./use-expand-on-mount.ts` (both Task 4).
 - Produces: `CardFlipTransition(props: RevealTransitionProps)`.
 
 - [ ] **Step 1: Write the failing test**
@@ -1431,26 +1475,12 @@ Expected: FAIL — module doesn't exist
 Create `src/components/reveal/card-flip-transition.tsx`:
 
 ```tsx
-import { useEffect, useState } from 'react';
 import type { RevealTransitionProps } from './reveal-types.ts';
+import { useExpandOnMount } from './use-expand-on-mount.ts';
 import styles from './card-flip-transition.module.scss';
 
 export function CardFlipTransition({ origin, onDone }: RevealTransitionProps) {
-  const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setExpanded(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const style = expanded
-    ? undefined
-    : {
-        left: origin.left,
-        top: origin.top,
-        width: origin.width,
-        height: origin.height,
-      };
+  const { expanded, style } = useExpandOnMount(origin);
 
   return (
     <div
