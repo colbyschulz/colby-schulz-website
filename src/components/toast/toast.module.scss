@@ -1,0 +1,62 @@
+@use '@/styles/tokens' as *;
+
+.viewport {
+  position: fixed;
+  // Clears the collapsed ChaosPanel band pinned to the bottom of the
+  // viewport (44px min-height + 2×2px border, see app.tsx CHAOS_PANEL_RESERVED).
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: $z-toast;
+  outline: none;
+}
+
+.root {
+  background: $surface-glass;
+  backdrop-filter: blur($blur-modal);
+  border: 1px solid $modal-border;
+  box-shadow: $modal-glow;
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: $modal-text;
+  font-family: $font-base;
+  font-size: $text-md;
+
+  &[data-state='open'] {
+    animation: toastIn 0.2s ease-out;
+  }
+
+  &[data-state='closed'] {
+    animation: toastOut 0.2s ease-in;
+  }
+}
+
+.description {
+  margin: 0;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

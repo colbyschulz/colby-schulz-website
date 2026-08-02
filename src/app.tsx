@@ -13,6 +13,7 @@ import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
 import { ResumeStage } from './components/resume-viewer/resume-stage';
 import { AboutContent } from './components/about-content/about-content';
+import { Toast } from './components/toast/toast';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -180,6 +181,7 @@ function App() {
     useState<ControlValues>(CALM_VALUES);
   const { activeModal, openModal, closeModal } = useRevealOrchestration();
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
+  const [toast, setToast] = useState({ open: false, message: '' });
   const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
     computeStackPositions(FLOAT_ITEMS),
   );
@@ -209,6 +211,19 @@ function App() {
     },
     [openModal],
   );
+
+  const handleHrefClick = useCallback((href: string) => {
+    window.location.href = href;
+    // mailto: links silently no-op when the browser has no mail client
+    // configured — copy the address to clipboard so there's always some
+    // feedback, regardless of whether a mail app actually opened.
+    if (!href.startsWith('mailto:') || !navigator.clipboard) return;
+    const email = href.slice('mailto:'.length).split('?')[0];
+    navigator.clipboard
+      .writeText(email)
+      .then(() => setToast({ open: true, message: `Copied ${email}` }))
+      .catch(() => {});
+  }, []);
 
   const handleModalClose = useCallback(() => {
     setFrozenKey(null);
@@ -261,9 +276,7 @@ function App() {
               staggerIndex={i}
               onClick={
                 item.href
-                  ? () => {
-                      window.location.href = item.href!;
-                    }
+                  ? () => handleHrefClick(item.href!)
                   : item.modal
                     ? (origin) => handleItemClick(item.key, origin)
                     : undefined
@@ -302,6 +315,12 @@ function App() {
           <activeConfig.modal.content />
         </Modal>
       )}
+
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        onOpenChange={(open) => setToast((t) => ({ ...t, open }))}
+      />
 
       <GrainOverlay opacity={controlValues.grain} />
     </ErrorBoundary>
