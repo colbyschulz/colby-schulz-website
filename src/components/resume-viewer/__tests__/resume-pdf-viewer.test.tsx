@@ -30,23 +30,18 @@ vi.mock('react-pdf', () => ({
   Page: ({
     pageNumber,
     width,
-    onLoadSuccess,
     onRenderSuccess,
   }: {
     pageNumber: number;
     width?: number;
-    onLoadSuccess?: (page: { originalWidth: number; originalHeight: number }) => void;
     onRenderSuccess?: () => void;
   }) => {
-    // Mock page aspect ratio of 0.75 (e.g. 600x800), chosen so the tests
-    // below land on clean pixel numbers rather than fractional ones.
-    // onRenderSuccess is deferred slightly, separate from onLoadSuccess, so
-    // tests can observe the real "loaded but not yet rendered" gap.
+    // onRenderSuccess is deferred (not fired synchronously on mount) so
+    // tests can observe the real "mounted but not yet rendered" gap.
     useEffect(() => {
-      onLoadSuccess?.({ originalWidth: 600, originalHeight: 800 });
       const timer = setTimeout(() => onRenderSuccess?.(), 20);
       return () => clearTimeout(timer);
-    }, [onLoadSuccess, onRenderSuccess]);
+    }, [onRenderSuccess]);
     return <div data-testid={`page-${pageNumber}`} data-width={width} />;
   },
 }));
@@ -120,9 +115,9 @@ describe('ResumePdfViewer', () => {
 
     render(<ResumePdfViewer file="pending.pdf" />);
 
-    // Same 600px width the real page would use once loaded (see the
-    // width-budget test above) — height is a generic document-shaped guess
-    // (600 / 0.75 = 800) since the real aspect ratio isn't known yet.
+    // Same 600px width the real page uses once loaded (see the width-budget
+    // test above) — height is 600 / 0.75 = 800, the same fixed assumption
+    // used everywhere, not just here, so this never has to change later.
     expect(screen.getByTestId('resume-stage')).toHaveStyle({ width: '600px', height: '800px' });
     expect(screen.getByTestId('resume-skeleton').className).not.toMatch(/hidden/);
 
@@ -142,5 +137,25 @@ describe('ResumePdfViewer', () => {
     await waitFor(() => {
       expect(screen.getByTestId('resume-skeleton').className).toMatch(/hidden/);
     });
+  });
+
+  it('does not change the stage width between the initial render and once the page has rendered', async () => {
+    // A narrow, tall viewport, where the height-derived budget dominates —
+    // the case that most exposed the old bug (sizing depended on the real
+    // PDF's aspect ratio, which only became known after mount, so the stage
+    // would resize once that arrived instead of staying put).
+    vi.stubGlobal('innerWidth', 400);
+    vi.stubGlobal('innerHeight', 800);
+
+    render(<ResumePdfViewer file="resume.pdf" />);
+    const initialWidth = screen.getByTestId('resume-stage').style.width;
+
+    await waitFor(() => {
+      expect(screen.getByTestId('resume-skeleton').className).toMatch(/hidden/);
+    });
+
+    expect(screen.getByTestId('resume-stage').style.width).toBe(initialWidth);
+
+    vi.unstubAllGlobals();
   });
 });
