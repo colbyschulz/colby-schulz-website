@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FloatProvider } from './components/float/float-provider';
 import type { FloatProviderHandle } from './components/float/float-types';
 import { FloatItem } from './components/float/float-item';
@@ -11,6 +11,7 @@ import { ContactEnvelope } from './components/icons/contact-envelope';
 import { ResumeDocument } from './components/icons/resume-document';
 import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
+import { ResumeStage } from './components/resume-viewer/resume-stage';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -20,15 +21,6 @@ import type {
 import type { ComponentType } from 'react';
 import type { FloatItemOrigin, Vec2 } from './components/float/float-types.ts';
 import styles from './app.module.scss';
-
-// Lazy-loaded so react-pdf/pdfjs-dist ship in a separate chunk, fetched only
-// when a visitor actually opens the Resume modal, instead of in the main
-// entry bundle every visitor downloads.
-const ResumePdfViewer = lazy(() =>
-  import('./components/resume-viewer/resume-pdf-viewer').then((m) => ({
-    default: m.ResumePdfViewer,
-  })),
-);
 
 export interface FloatItemContentProps {
   label: string;
@@ -63,7 +55,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'resume',
     label: 'Resume',
     content: ResumeDocument,
-    modal: { title: 'Resume', buttonText: "looks good", content: ResumePdfViewer },
+    modal: { title: 'Resume', buttonText: "looks good", content: ResumeStage },
     freezeOnHover: true,
     // 140 × 334/260 = 180px desktop; 95 × 334/260 + 16px padding = 138px mobile
     heights: { desktop: 180, mobile: 138 },
@@ -300,9 +292,7 @@ function App() {
           origin={activeModal.origin}
           buttonText={activeConfig.modal.buttonText}
         >
-          <Suspense fallback={null}>
-            <activeConfig.modal.content />
-          </Suspense>
+          <activeConfig.modal.content />
         </Modal>
       )}
 
