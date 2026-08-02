@@ -13,7 +13,6 @@ import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
 import { ResumeStage } from './components/resume-viewer/resume-stage';
 import { AboutContent } from './components/about-content/about-content';
-import { ContactContent } from './components/contact-content/contact-content';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -38,6 +37,8 @@ interface FloatItemConfig {
     content: ComponentType;
     buttonText: string;
   };
+  // Bypasses the modal entirely — clicking navigates straight to this URL (e.g. a mailto: link).
+  href?: string;
   // Pixel heights per breakpoint: SVG aspect ratio × CSS width + touch padding where applicable.
   // Must be updated if icon CSS widths change.
   heights: { desktop: number; mobile: number };
@@ -66,7 +67,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', buttonText: "talk soon", content: ContactContent },
+    href: 'mailto:colbyschulz@gmail.com',
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
@@ -259,9 +260,13 @@ function App() {
               chaosActive={chaosActive}
               staggerIndex={i}
               onClick={
-                item.modal
-                  ? (origin) => handleItemClick(item.key, origin)
-                  : undefined
+                item.href
+                  ? () => {
+                      window.location.href = item.href!;
+                    }
+                  : item.modal
+                    ? (origin) => handleItemClick(item.key, origin)
+                    : undefined
               }
             >
               {item.content ? (
