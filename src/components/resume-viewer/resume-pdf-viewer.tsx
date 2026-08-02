@@ -13,15 +13,25 @@ const DEFAULT_FILE = '/resume.pdf';
 
 // react-pdf's default (no size prop) renders at the PDF's native point size
 // (~612px wide for a Letter page) — legible but small relative to the
-// screen. Render noticeably wider instead: a healthy chunk of the viewport
-// width, capped so it doesn't get absurd on very wide screens. The page's
-// own aspect ratio determines height, so it can run taller than one screen
-// and scroll — that's fine for a multi-page resume.
+// screen. Instead, size to whichever is bigger: a ratio of viewport width
+// (what actually matters on wide desktop windows) or a ratio of viewport
+// height converted through the page's own aspect ratio (what matters on
+// narrow, tall mobile screens, where Modal goes full-height and there's a
+// lot more vertical room than horizontal). Either way, clamp to a ceiling
+// just under the actual viewport width so it never overflows the screen.
+// The page can still run taller than one view and scroll — normal for a
+// multi-page resume.
 const PAGE_WIDTH_RATIO = 0.6;
 const PAGE_WIDTH_MAX = 900;
+const PAGE_HEIGHT_RATIO = 0.8;
+const VIEWPORT_WIDTH_CEILING_RATIO = 0.92;
 
-function computePageWidth() {
-  return Math.min(window.innerWidth * PAGE_WIDTH_RATIO, PAGE_WIDTH_MAX);
+function computePageWidth(aspectRatio: number | null) {
+  const widthBudget = Math.min(window.innerWidth * PAGE_WIDTH_RATIO, PAGE_WIDTH_MAX);
+  const heightDerivedBudget =
+    aspectRatio === null ? 0 : window.innerHeight * PAGE_HEIGHT_RATIO * aspectRatio;
+  const target = Math.max(widthBudget, heightDerivedBudget);
+  return Math.round(Math.min(target, window.innerWidth * VIEWPORT_WIDTH_CEILING_RATIO));
 }
 
 interface ResumePdfViewerProps {
@@ -31,13 +41,15 @@ interface ResumePdfViewerProps {
 export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const [pageWidth, setPageWidth] = useState(computePageWidth);
+  const [pageAspectRatio, setPageAspectRatio] = useState<number | null>(null);
+  const [pageWidth, setPageWidth] = useState(() => computePageWidth(null));
 
   useEffect(() => {
-    const handleResize = () => setPageWidth(computePageWidth());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    const recompute = () => setPageWidth(computePageWidth(pageAspectRatio));
+    recompute();
+    window.addEventListener('resize', recompute);
+    return () => window.removeEventListener('resize', recompute);
+  }, [pageAspectRatio]);
 
   if (loadError) {
     return <p className={styles.error}>Couldn&apos;t load the resume PDF.</p>;
@@ -53,7 +65,17 @@ export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
       >
         {numPages !== null &&
           Array.from({ length: numPages }, (_, i) => (
-            <Page key={i} pageNumber={i + 1} width={pageWidth} className={styles.page} />
+            <Page
+              key={i}
+              pageNumber={i + 1}
+              width={pageWidth}
+              className={styles.page}
+              onLoadSuccess={
+                i === 0
+                  ? (page) => setPageAspectRatio(page.originalWidth / page.originalHeight)
+                  : undefined
+              }
+            />
           ))}
       </Document>
       <a href={file} download className={styles.download}>

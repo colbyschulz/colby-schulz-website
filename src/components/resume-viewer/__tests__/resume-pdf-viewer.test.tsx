@@ -25,9 +25,22 @@ vi.mock('react-pdf', () => ({
     }, [file, onLoadSuccess, onLoadError]);
     return <div>{children}</div>;
   },
-  Page: ({ pageNumber, width }: { pageNumber: number; width?: number }) => (
-    <div data-testid={`page-${pageNumber}`} data-width={width} />
-  ),
+  Page: ({
+    pageNumber,
+    width,
+    onLoadSuccess,
+  }: {
+    pageNumber: number;
+    width?: number;
+    onLoadSuccess?: (page: { originalWidth: number; originalHeight: number }) => void;
+  }) => {
+    // Mock page aspect ratio of 0.75 (e.g. 600x800), chosen so the tests
+    // below land on clean pixel numbers rather than fractional ones.
+    useEffect(() => {
+      onLoadSuccess?.({ originalWidth: 600, originalHeight: 800 });
+    }, [onLoadSuccess]);
+    return <div data-testid={`page-${pageNumber}`} data-width={width} />;
+  },
 }));
 
 describe('ResumePdfViewer', () => {
@@ -54,11 +67,14 @@ describe('ResumePdfViewer', () => {
     );
   });
 
-  it('sizes each page to a ratio of the viewport width so pages read as bigger', () => {
+  it('on a wide-ish viewport, sizes each page by the width budget', () => {
     vi.stubGlobal('innerWidth', 1000);
+    vi.stubGlobal('innerHeight', 700);
 
     render(<ResumePdfViewer file="resume.pdf" />);
 
+    // widthBudget = min(1000*0.6, 900) = 600; height-derived candidate
+    // (560*0.75=420) is smaller, so width wins.
     expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '600');
     expect(screen.getByTestId('page-3')).toHaveAttribute('data-width', '600');
 
@@ -67,10 +83,25 @@ describe('ResumePdfViewer', () => {
 
   it('caps the page width so it does not grow unbounded on very wide viewports', () => {
     vi.stubGlobal('innerWidth', 3000);
+    vi.stubGlobal('innerHeight', 800);
 
     render(<ResumePdfViewer file="resume.pdf" />);
 
     expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '900');
+
+    vi.unstubAllGlobals();
+  });
+
+  it('on a narrow, tall viewport (mobile), uses the height budget instead of shrinking to the width budget', () => {
+    vi.stubGlobal('innerWidth', 400);
+    vi.stubGlobal('innerHeight', 800);
+
+    render(<ResumePdfViewer file="resume.pdf" />);
+
+    // widthBudget = min(400*0.6, 900) = 240; height-derived candidate
+    // (640*0.75=480) is bigger, so it wins — then clamped to the viewport
+    // width ceiling (400*0.92=368) so it never overflows the screen.
+    expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '368');
 
     vi.unstubAllGlobals();
   });
