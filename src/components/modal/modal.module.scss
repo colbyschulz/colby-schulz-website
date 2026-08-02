@@ -23,8 +23,8 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 90vw;
-  height: 85dvh;
+  max-width: 90vw;
+  max-height: 85dvh;
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
@@ -35,15 +35,17 @@
 
   background: $surface-glass;
   backdrop-filter: blur($blur-modal);
-  border: 1px solid $border-default;
-  box-shadow: $glow-default;
+  border: 1px solid $modal-border;
+  box-shadow: $modal-glow;
   border-radius: 16px;
-  color: $text-primary;
+  color: $modal-text;
   font-family: $font-base;
 
   @include mobile {
     width: 100vw;
     height: 100dvh;
+    max-width: 100vw;
+    max-height: 100dvh;
     border-radius: 0;
     border: none;
     box-shadow: none;
@@ -63,6 +65,7 @@
   }
 
   .content {
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
 }
@@ -71,7 +74,7 @@
   font-size: $text-lg;
   font-weight: $weight-light;
   padding: 20px 24px 16px;
-  border-bottom: 1px solid $border-subtle;
+  border-bottom: 1px solid $modal-border-subtle;
   margin: 0;
 }
 
@@ -83,19 +86,19 @@
   padding: 20px 24px;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: $scrollbar-thumb transparent;
+  scrollbar-color: $modal-scrollbar-thumb transparent;
 }
 
 .footer {
   padding: 16px 24px;
-  border-top: 1px solid $border-subtle;
+  border-top: 1px solid $modal-border-subtle;
   display: flex;
   justify-content: flex-end;
 }
 
 .closeButton {
   background: transparent;
-  border: 1px solid $border-default;
+  border: 1px solid $modal-border;
   border-radius: 8px;
   color: inherit;
   cursor: pointer;
@@ -113,7 +116,7 @@
 
   @include can-hover {
     &:hover {
-      border-color: $border-hover;
+      border-color: $modal-border-hover;
     }
   }
 }

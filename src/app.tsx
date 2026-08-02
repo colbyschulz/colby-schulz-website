@@ -11,10 +11,6 @@ import { ContactEnvelope } from './components/icons/contact-envelope';
 import { ResumeDocument } from './components/icons/resume-document';
 import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
-import type { OpenAnimation, RevealTransitionProps } from './components/reveal/reveal-types.ts';
-import { PageFanTransition } from './components/reveal/page-fan-transition';
-import { EnvelopeTransition } from './components/reveal/envelope-transition';
-import { CardFlipTransition } from './components/reveal/card-flip-transition';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -46,25 +42,18 @@ interface FloatItemConfig {
   modal?: {
     title: string;
     content: ComponentType;
-    openAnimation: OpenAnimation;
   };
   // Pixel heights per breakpoint: SVG aspect ratio × CSS width + touch padding where applicable.
   // Must be updated if icon CSS widths change.
   heights: { desktop: number; mobile: number };
 }
 
-const REVEAL_TRANSITIONS: Record<OpenAnimation, ComponentType<RevealTransitionProps>> = {
-  pages: PageFanTransition,
-  envelope: EnvelopeTransition,
-  flip: CardFlipTransition,
-};
-
 const FLOAT_ITEMS: FloatItemConfig[] = [
   {
     key: 'name',
     label: 'Colby Schulz',
     content: NameCard,
-    modal: { title: 'About', content: () => <p>About content coming soon.</p>, openAnimation: 'pages' },
+    modal: { title: 'About', content: () => <p>About content coming soon.</p> },
     freezeOnHover: true,
     // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
     heights: { desktop: 112, mobile: 93 },
@@ -73,7 +62,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'resume',
     label: 'Resume',
     content: ResumeDocument,
-    modal: { title: 'Resume', content: ResumePdfViewer, openAnimation: 'pages' },
+    modal: { title: 'Resume', content: ResumePdfViewer },
     freezeOnHover: true,
     // 140 × 334/260 = 180px desktop; 95 × 334/260 + 16px padding = 138px mobile
     heights: { desktop: 180, mobile: 138 },
@@ -82,7 +71,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p>, openAnimation: 'pages' },
+    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
@@ -193,8 +182,7 @@ function App() {
   const [chaosActive, setChaosActive] = useState(false);
   const [controlValues, setControlValues] =
     useState<ControlValues>(CALM_VALUES);
-  const { revealing, activeModal, startReveal, finishReveal, closeModal } =
-    useRevealOrchestration();
+  const { activeModal, openModal, closeModal } = useRevealOrchestration();
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
   const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
     computeStackPositions(FLOAT_ITEMS),
@@ -221,9 +209,9 @@ function App() {
   const handleItemClick = useCallback(
     (key: string, rect: FloatItemOrigin) => {
       setFrozenKey(key);
-      startReveal(key, rect);
+      openModal(key, rect);
     },
-    [startReveal],
+    [openModal],
   );
 
   const handleModalClose = useCallback(() => {
@@ -254,12 +242,6 @@ function App() {
   const activeConfig = activeModal
     ? FLOAT_ITEMS.find((item) => item.key === activeModal.key)
     : null;
-  const revealingConfig = revealing
-    ? FLOAT_ITEMS.find((item) => item.key === revealing.key)
-    : null;
-  const RevealTransitionComponent = revealingConfig?.modal
-    ? REVEAL_TRANSITIONS[revealingConfig.modal.openAnimation]
-    : undefined;
 
   return (
     <ErrorBoundary>
@@ -308,10 +290,6 @@ function App() {
           onMaxPower={handleMaxPower}
         />
       </div>
-
-      {revealing && RevealTransitionComponent && (
-        <RevealTransitionComponent origin={revealing.rect} onDone={finishReveal} />
-      )}
 
       {activeModal && activeConfig?.modal && (
         <Modal

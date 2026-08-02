@@ -9,8 +9,20 @@ $z-modal: 4;
 
 // ─── Surfaces ─────────────────────────────────────────────────────────────────
 
-$surface-glass: rgba(0, 0, 0, 0.5); // modal, chat panel background
-$surface-overlay: rgba(0, 0, 0, 0.2); // modal backdrop
+$surface-glass: rgba(255, 255, 255, 0.7); // modal background (white frosted)
+$surface-overlay: rgba(255, 255, 255, 0.4); // modal backdrop
+
+// ─── Modal (white frosted glass — its own dark-on-light palette) ──────────────
+// The rest of the site (chat, chaos panel) is dark glass with light text/
+// borders. Modal inverts that, so it needs its own set instead of reusing
+// $text-primary/$border-default/etc., which stay light-on-dark for those.
+
+$modal-text: #1a1a1a;
+$modal-border: rgba(0, 0, 0, 0.15);
+$modal-border-subtle: rgba(0, 0, 0, 0.08);
+$modal-border-hover: rgba(0, 0, 0, 0.35);
+$modal-scrollbar-thumb: rgba(0, 0, 0, 0.2);
+$modal-glow: 0 8px 32px rgba(0, 0, 0, 0.12);
 
 // ─── Borders ──────────────────────────────────────────────────────────────────
 

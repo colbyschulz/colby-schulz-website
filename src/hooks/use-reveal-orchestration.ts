@@ -1,12 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { FloatItemOrigin } from '../components/float/float-types.ts';
 import type { ModalOrigin } from '../components/modal/modal.types.ts';
-import { usePrefersReducedMotion } from './use-prefers-reduced-motion.ts';
-
-export interface RevealingState {
-  key: string;
-  rect: FloatItemOrigin;
-}
 
 export interface ActiveModal {
   key: string;
@@ -18,28 +12,13 @@ function centerOf(rect: FloatItemOrigin): ModalOrigin {
 }
 
 export function useRevealOrchestration() {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const [revealing, setRevealing] = useState<RevealingState | null>(null);
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
 
-  const startReveal = useCallback(
-    (key: string, rect: FloatItemOrigin) => {
-      if (prefersReducedMotion) {
-        setActiveModal({ key, origin: centerOf(rect) });
-        return;
-      }
-      setRevealing({ key, rect });
-    },
-    [prefersReducedMotion],
-  );
-
-  const finishReveal = useCallback(() => {
-    if (!revealing) return;
-    setActiveModal({ key: revealing.key, origin: centerOf(revealing.rect) });
-    setRevealing(null);
-  }, [revealing]);
+  const openModal = useCallback((key: string, rect: FloatItemOrigin) => {
+    setActiveModal({ key, origin: centerOf(rect) });
+  }, []);
 
   const closeModal = useCallback(() => setActiveModal(null), []);
 
-  return { revealing, activeModal, startReveal, finishReveal, closeModal };
+  return { activeModal, openModal, closeModal };
 }

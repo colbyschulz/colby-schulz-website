@@ -47,7 +47,7 @@ export function Modal({ open, onClose, title, origin, children }: ModalProps) {
           <div className={styles.body}>{children}</div>
           <div className={styles.footer}>
             <button className={styles.closeButton} onClick={handleClose}>
-              cool
+              ok
             </button>
           </div>
         </Dialog.Content>
