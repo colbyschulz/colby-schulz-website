@@ -1,0 +1,47 @@
+@use '@/styles/tokens' as *;
+
+.panel {
+  position: fixed;
+  z-index: $z-modal;
+  transition:
+    left 0.35s ease-out,
+    top 0.35s ease-out,
+    width 0.35s ease-out,
+    height 0.35s ease-out,
+    transform 0.35s ease-out;
+  pointer-events: none;
+}
+
+.panel.expanded {
+  left: 50%;
+  top: 50%;
+  width: 90vw;
+  height: 85dvh;
+  transform: translate(-50%, -50%);
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  background: $surface-glass;
+  border: 1px solid $border-default;
+  border-radius: 16px;
+}
+
+.flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: $surface-glass;
+  border: 1px solid $border-default;
+  border-radius: 16px 16px 0 0;
+  transform-origin: top center;
+  transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+}
+
+.expanded .flap {
+  transform: rotateX(-170deg);
+  opacity: 0;
+}
