@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { ModalProps } from './modal.types.ts';
 import styles from './modal.module.scss';
 
-export function Modal({ open, onClose, title, origin, children }: ModalProps) {
+export function Modal({ open, onClose, title, buttonText, origin, children }: ModalProps) {
   const [closing, setClosing] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +47,7 @@ export function Modal({ open, onClose, title, origin, children }: ModalProps) {
           <div className={styles.body}>{children}</div>
           <div className={styles.footer}>
             <button className={styles.closeButton} onClick={handleClose}>
-              ok
+              {buttonText}
             </button>
           </div>
         </Dialog.Content>
