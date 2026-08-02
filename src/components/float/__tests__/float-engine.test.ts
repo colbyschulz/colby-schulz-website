@@ -168,12 +168,14 @@ describe('FloatEngine', () => {
   describe('edge collision', () => {
     it('reverses x velocity when hitting the right edge', () => {
       const engine = new FloatEngine(2, 800, 600);
-      // Place item right at the edge: viewport 800, item width 100, so max x = 700
-      engine.register('a', { width: 100, height: 50 }, { x: 699, y: 100 });
+      // Place item at maxX boundary: viewport 800, item width 100, maxX = 700
+      // Register at x: 750, which after centering (750 - 50) = 700 = maxX.
+      // Velocity of 5 moves it past the boundary, triggering edge collision.
+      engine.register('a', { width: 100, height: 50 }, { x: 750, y: 100 });
 
       const item = engine.getItem('a')!;
-      // Force velocity to the right
-      item.velocity.x = Math.abs(item.velocity.x);
+      // Explicitly set velocity to move the item past the edge in one tick
+      item.velocity.x = 5;
       item.direction.x = 1;
 
       engine.tick();
@@ -184,11 +186,12 @@ describe('FloatEngine', () => {
 
     it('reverses y velocity when hitting the bottom edge', () => {
       const engine = new FloatEngine(2, 800, 600);
-      // Max y = 600 - 50 = 550
-      engine.register('a', { width: 100, height: 50 }, { x: 100, y: 549 });
+      // Max y = 600 - 50 = 550, place item at 545 so it reaches 550+ in one tick
+      engine.register('a', { width: 100, height: 50 }, { x: 100, y: 545 });
 
       const item = engine.getItem('a')!;
-      item.velocity.y = Math.abs(item.velocity.y);
+      // Explicitly set velocity to move the item past the edge in one tick
+      item.velocity.y = 5;
       item.direction.y = 1;
 
       engine.tick();
@@ -199,11 +202,14 @@ describe('FloatEngine', () => {
 
     it('reverses velocity when hitting the top/left edge', () => {
       const engine = new FloatEngine(2, 800, 600);
+      // Register at x: 1, y: 1. After centering (1 - 50 = -49), item is already
+      // past left boundary at x = -49. Move it left and up with negative velocities.
       engine.register('a', { width: 100, height: 50 }, { x: 1, y: 1 });
 
       const item = engine.getItem('a')!;
-      item.velocity.x = -Math.abs(item.velocity.x);
-      item.velocity.y = -Math.abs(item.velocity.y);
+      // Explicitly set velocities to move item further into boundaries (negative = left/up)
+      item.velocity.x = -5;
+      item.velocity.y = -5;
       item.direction.x = -1;
       item.direction.y = -1;
 
