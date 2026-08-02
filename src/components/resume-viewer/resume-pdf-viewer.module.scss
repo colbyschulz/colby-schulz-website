@@ -9,19 +9,35 @@
 
 .page {
   max-width: 100%;
-  box-shadow: $glow-default;
+  box-shadow: $modal-glow;
   border-radius: 4px;
   overflow: hidden;
 }
 
-.error,
-.loading {
-  color: $text-muted;
+.skeleton {
+  max-width: 100%;
+  background: $modal-skeleton;
+  border-radius: 4px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.error {
+  color: $modal-text-muted;
   font-size: $text-md;
 }
 
 .download {
-  color: $text-primary;
+  color: $modal-text;
   font-size: $text-sm;
   letter-spacing: $tracking-wide;
   text-decoration: underline;

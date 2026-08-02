@@ -18,11 +18,13 @@ $surface-overlay: rgba(255, 255, 255, 0.4); // modal backdrop
 // $text-primary/$border-default/etc., which stay light-on-dark for those.
 
 $modal-text: #1a1a1a;
+$modal-text-muted: rgba(26, 26, 26, 0.55); // placeholder/empty-state text inside Modal
 $modal-border: rgba(0, 0, 0, 0.15);
 $modal-border-subtle: rgba(0, 0, 0, 0.08);
 $modal-border-hover: rgba(0, 0, 0, 0.35);
 $modal-scrollbar-thumb: rgba(0, 0, 0, 0.2);
 $modal-glow: 0 8px 32px rgba(0, 0, 0, 0.12);
+$modal-skeleton: rgba(0, 0, 0, 0.06); // loading-placeholder fill inside Modal
 
 // ─── Borders ──────────────────────────────────────────────────────────────────
 

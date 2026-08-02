@@ -12,18 +12,23 @@ vi.mock('react-pdf', () => ({
     file,
     onLoadSuccess,
     onLoadError,
+    loading,
     children,
   }: {
     file: string;
     onLoadSuccess: (info: { numPages: number }) => void;
     onLoadError: () => void;
+    loading?: ReactNode;
     children: ReactNode;
   }) => {
+    // 'pending.pdf' never resolves, simulating a still-loading document so
+    // tests can inspect the `loading` placeholder's own appearance.
     useEffect(() => {
+      if (file === 'pending.pdf') return;
       if (file === 'broken.pdf') onLoadError();
       else onLoadSuccess({ numPages: 3 });
     }, [file, onLoadSuccess, onLoadError]);
-    return <div>{children}</div>;
+    return file === 'pending.pdf' ? <>{loading}</> : <div>{children}</div>;
   },
   Page: ({
     pageNumber,
@@ -102,6 +107,21 @@ describe('ResumePdfViewer', () => {
     // (640*0.75=480) is bigger, so it wins — then clamped to the viewport
     // width ceiling (400*0.92=368) so it never overflows the screen.
     expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '368');
+
+    vi.unstubAllGlobals();
+  });
+
+  it('shows a placeholder already sized like the eventual page while the document is still loading', () => {
+    vi.stubGlobal('innerWidth', 1000);
+    vi.stubGlobal('innerHeight', 700);
+
+    render(<ResumePdfViewer file="pending.pdf" />);
+
+    // Same 600px width the real page would use once loaded (see the
+    // width-budget test above) — height is a generic document-shaped guess
+    // (600 / 0.75 = 800) since the real aspect ratio isn't known yet.
+    const skeleton = screen.getByTestId('resume-skeleton');
+    expect(skeleton).toHaveStyle({ width: '600px', height: '800px' });
 
     vi.unstubAllGlobals();
   });

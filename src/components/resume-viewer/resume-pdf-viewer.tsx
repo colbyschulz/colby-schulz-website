@@ -26,6 +26,10 @@ const PAGE_WIDTH_MAX = 900;
 const PAGE_HEIGHT_RATIO = 0.8;
 const VIEWPORT_WIDTH_CEILING_RATIO = 0.92;
 
+// Generic document-shaped guess used only for the loading placeholder,
+// before the real PDF reports its own aspect ratio.
+const ASSUMED_ASPECT_RATIO = 0.75;
+
 function computePageWidth(aspectRatio: number | null) {
   const widthBudget = Math.min(window.innerWidth * PAGE_WIDTH_RATIO, PAGE_WIDTH_MAX);
   const heightDerivedBudget =
@@ -55,13 +59,24 @@ export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
     return <p className={styles.error}>Couldn&apos;t load the resume PDF.</p>;
   }
 
+  // Reserves the same footprint the real page will use, so Modal's
+  // content-driven size doesn't jump once the PDF actually loads — only
+  // the placeholder-to-real-content swap happens, not a resize.
+  const skeleton = (
+    <div
+      data-testid="resume-skeleton"
+      className={styles.skeleton}
+      style={{ width: pageWidth, height: Math.round(pageWidth / ASSUMED_ASPECT_RATIO) }}
+    />
+  );
+
   return (
     <div className={styles.viewer}>
       <Document
         file={file}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         onLoadError={() => setLoadError(true)}
-        loading={<p className={styles.loading}>Loading resume...</p>}
+        loading={skeleton}
       >
         {numPages !== null &&
           Array.from({ length: numPages }, (_, i) => (
@@ -70,6 +85,7 @@ export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
               pageNumber={i + 1}
               width={pageWidth}
               className={styles.page}
+              loading={skeleton}
               onLoadSuccess={
                 i === 0
                   ? (page) => setPageAspectRatio(page.originalWidth / page.originalHeight)
