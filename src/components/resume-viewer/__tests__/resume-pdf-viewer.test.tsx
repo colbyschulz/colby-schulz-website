@@ -25,7 +25,9 @@ vi.mock('react-pdf', () => ({
     }, [file, onLoadSuccess, onLoadError]);
     return <div>{children}</div>;
   },
-  Page: ({ pageNumber }: { pageNumber: number }) => <div data-testid={`page-${pageNumber}`} />,
+  Page: ({ pageNumber, width }: { pageNumber: number; width?: number }) => (
+    <div data-testid={`page-${pageNumber}`} data-width={width} />
+  ),
 }));
 
 describe('ResumePdfViewer', () => {
@@ -50,5 +52,26 @@ describe('ResumePdfViewer', () => {
       'href',
       'resume.pdf',
     );
+  });
+
+  it('sizes each page to a ratio of the viewport width so pages read as bigger', () => {
+    vi.stubGlobal('innerWidth', 1000);
+
+    render(<ResumePdfViewer file="resume.pdf" />);
+
+    expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '600');
+    expect(screen.getByTestId('page-3')).toHaveAttribute('data-width', '600');
+
+    vi.unstubAllGlobals();
+  });
+
+  it('caps the page width so it does not grow unbounded on very wide viewports', () => {
+    vi.stubGlobal('innerWidth', 3000);
+
+    render(<ResumePdfViewer file="resume.pdf" />);
+
+    expect(screen.getByTestId('page-1')).toHaveAttribute('data-width', '900');
+
+    vi.unstubAllGlobals();
   });
 });
