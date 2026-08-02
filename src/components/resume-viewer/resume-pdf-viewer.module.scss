@@ -14,10 +14,23 @@
   overflow: hidden;
 }
 
-.skeleton {
+.stage {
+  position: relative;
   max-width: 100%;
+  overflow: hidden;
+}
+
+.skeleton {
+  position: absolute;
+  inset: 0;
   background: $modal-skeleton;
   border-radius: 4px;
+  transition: opacity 0.3s ease-out;
+}
+
+.skeleton.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .error {

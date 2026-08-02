@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { ResumePdfViewer } from '../resume-pdf-viewer';
@@ -12,38 +12,41 @@ vi.mock('react-pdf', () => ({
     file,
     onLoadSuccess,
     onLoadError,
-    loading,
     children,
   }: {
     file: string;
     onLoadSuccess: (info: { numPages: number }) => void;
     onLoadError: () => void;
-    loading?: ReactNode;
     children: ReactNode;
   }) => {
-    // 'pending.pdf' never resolves, simulating a still-loading document so
-    // tests can inspect the `loading` placeholder's own appearance.
+    // 'pending.pdf' never resolves, simulating a still-loading document.
     useEffect(() => {
       if (file === 'pending.pdf') return;
       if (file === 'broken.pdf') onLoadError();
       else onLoadSuccess({ numPages: 3 });
     }, [file, onLoadSuccess, onLoadError]);
-    return file === 'pending.pdf' ? <>{loading}</> : <div>{children}</div>;
+    return <div>{children}</div>;
   },
   Page: ({
     pageNumber,
     width,
     onLoadSuccess,
+    onRenderSuccess,
   }: {
     pageNumber: number;
     width?: number;
     onLoadSuccess?: (page: { originalWidth: number; originalHeight: number }) => void;
+    onRenderSuccess?: () => void;
   }) => {
     // Mock page aspect ratio of 0.75 (e.g. 600x800), chosen so the tests
     // below land on clean pixel numbers rather than fractional ones.
+    // onRenderSuccess is deferred slightly, separate from onLoadSuccess, so
+    // tests can observe the real "loaded but not yet rendered" gap.
     useEffect(() => {
       onLoadSuccess?.({ originalWidth: 600, originalHeight: 800 });
-    }, [onLoadSuccess]);
+      const timer = setTimeout(() => onRenderSuccess?.(), 20);
+      return () => clearTimeout(timer);
+    }, [onLoadSuccess, onRenderSuccess]);
     return <div data-testid={`page-${pageNumber}`} data-width={width} />;
   },
 }));
@@ -111,7 +114,7 @@ describe('ResumePdfViewer', () => {
     vi.unstubAllGlobals();
   });
 
-  it('shows a placeholder already sized like the eventual page while the document is still loading', () => {
+  it('reserves a stage sized like the eventual page while the document is still loading', () => {
     vi.stubGlobal('innerWidth', 1000);
     vi.stubGlobal('innerHeight', 700);
 
@@ -120,9 +123,24 @@ describe('ResumePdfViewer', () => {
     // Same 600px width the real page would use once loaded (see the
     // width-budget test above) — height is a generic document-shaped guess
     // (600 / 0.75 = 800) since the real aspect ratio isn't known yet.
-    const skeleton = screen.getByTestId('resume-skeleton');
-    expect(skeleton).toHaveStyle({ width: '600px', height: '800px' });
+    expect(screen.getByTestId('resume-stage')).toHaveStyle({ width: '600px', height: '800px' });
+    expect(screen.getByTestId('resume-skeleton').className).not.toMatch(/hidden/);
 
     vi.unstubAllGlobals();
+  });
+
+  it('keeps the skeleton visible until the first page has actually rendered', () => {
+    render(<ResumePdfViewer file="resume.pdf" />);
+
+    // onRenderSuccess is deferred in the mock, so it hasn't fired yet here.
+    expect(screen.getByTestId('resume-skeleton').className).not.toMatch(/hidden/);
+  });
+
+  it('fades out the skeleton once the first page has rendered', async () => {
+    render(<ResumePdfViewer file="resume.pdf" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('resume-skeleton').className).toMatch(/hidden/);
+    });
   });
 });

@@ -47,6 +47,11 @@ export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
   const [loadError, setLoadError] = useState(false);
   const [pageAspectRatio, setPageAspectRatio] = useState<number | null>(null);
   const [pageWidth, setPageWidth] = useState(() => computePageWidth(null));
+  // True once the first page has actually painted (react-pdf's
+  // onRenderSuccess), not just once its metadata loaded — painting is what
+  // makes it safe to reveal, and what makes fading the skeleton out feel
+  // like content appearing rather than a page popping into a blank spot.
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const recompute = () => setPageWidth(computePageWidth(pageAspectRatio));
@@ -59,41 +64,47 @@ export function ResumePdfViewer({ file = DEFAULT_FILE }: ResumePdfViewerProps) {
     return <p className={styles.error}>Couldn&apos;t load the resume PDF.</p>;
   }
 
-  // Reserves the same footprint the real page will use, so Modal's
-  // content-driven size doesn't jump once the PDF actually loads — only
-  // the placeholder-to-real-content swap happens, not a resize.
-  const skeleton = (
-    <div
-      data-testid="resume-skeleton"
-      className={styles.skeleton}
-      style={{ width: pageWidth, height: Math.round(pageWidth / ASSUMED_ASPECT_RATIO) }}
-    />
-  );
+  // Reserves the same footprint the first page will use, so Modal's
+  // content-driven size doesn't jump once the PDF actually loads. Stays
+  // fixed-height (clipping the still-rendering pages underneath) until
+  // ready, then relaxes to auto so the rest of the pages can stack normally.
+  const stageHeight = Math.round(pageWidth / (pageAspectRatio ?? ASSUMED_ASPECT_RATIO));
 
   return (
     <div className={styles.viewer}>
-      <Document
-        file={file}
-        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-        onLoadError={() => setLoadError(true)}
-        loading={skeleton}
+      <div
+        data-testid="resume-stage"
+        className={styles.stage}
+        style={{ width: pageWidth, height: ready ? undefined : stageHeight }}
       >
-        {numPages !== null &&
-          Array.from({ length: numPages }, (_, i) => (
-            <Page
-              key={i}
-              pageNumber={i + 1}
-              width={pageWidth}
-              className={styles.page}
-              loading={skeleton}
-              onLoadSuccess={
-                i === 0
-                  ? (page) => setPageAspectRatio(page.originalWidth / page.originalHeight)
-                  : undefined
-              }
-            />
-          ))}
-      </Document>
+        <Document
+          file={file}
+          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+          onLoadError={() => setLoadError(true)}
+          loading={null}
+        >
+          {numPages !== null &&
+            Array.from({ length: numPages }, (_, i) => (
+              <Page
+                key={i}
+                pageNumber={i + 1}
+                width={pageWidth}
+                className={styles.page}
+                loading={null}
+                onLoadSuccess={
+                  i === 0
+                    ? (page) => setPageAspectRatio(page.originalWidth / page.originalHeight)
+                    : undefined
+                }
+                onRenderSuccess={i === 0 ? () => setReady(true) : undefined}
+              />
+            ))}
+        </Document>
+        <div
+          data-testid="resume-skeleton"
+          className={`${styles.skeleton}${ready ? ` ${styles.hidden}` : ''}`}
+        />
+      </div>
       <a href={file} download className={styles.download}>
         Download PDF
       </a>
