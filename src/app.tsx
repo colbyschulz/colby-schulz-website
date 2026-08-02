@@ -13,6 +13,7 @@ import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
 import type { OpenAnimation, RevealTransitionProps } from './components/reveal/reveal-types.ts';
 import { PageFanTransition } from './components/reveal/page-fan-transition';
+import { EnvelopeTransition } from './components/reveal/envelope-transition';
 import { ResumePdfViewer } from './components/resume-viewer/resume-pdf-viewer';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
@@ -45,6 +46,7 @@ interface FloatItemConfig {
 
 const REVEAL_TRANSITIONS: Partial<Record<OpenAnimation, ComponentType<RevealTransitionProps>>> = {
   pages: PageFanTransition,
+  envelope: EnvelopeTransition,
 };
 
 const FLOAT_ITEMS: FloatItemConfig[] = [
@@ -70,7 +72,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
+    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p>, openAnimation: 'envelope' },
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
