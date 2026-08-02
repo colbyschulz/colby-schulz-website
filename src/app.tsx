@@ -11,14 +11,17 @@ import { ContactEnvelope } from './components/icons/contact-envelope';
 import { ResumeDocument } from './components/icons/resume-document';
 import { NameCard } from './components/icons/name-card';
 import { Modal } from './components/modal/modal';
-import type { ModalOrigin } from './components/modal/modal.types';
+import type { OpenAnimation, RevealTransitionProps } from './components/reveal/reveal-types.ts';
+import { PageFanTransition } from './components/reveal/page-fan-transition';
+import { ResumePdfViewer } from './components/resume-viewer/resume-pdf-viewer';
+import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
   ControlValues,
 } from './components/chaos-panel/chaos-panel.types';
 
 import type { ComponentType } from 'react';
-import type { Vec2 } from './components/float/float-types';
+import type { FloatItemOrigin, Vec2 } from './components/float/float-types.ts';
 import styles from './app.module.scss';
 
 export interface FloatItemContentProps {
@@ -33,11 +36,16 @@ interface FloatItemConfig {
   modal?: {
     title: string;
     content: ComponentType;
+    openAnimation: OpenAnimation;
   };
   // Pixel heights per breakpoint: SVG aspect ratio × CSS width + touch padding where applicable.
   // Must be updated if icon CSS widths change.
   heights: { desktop: number; mobile: number };
 }
+
+const REVEAL_TRANSITIONS: Partial<Record<OpenAnimation, ComponentType<RevealTransitionProps>>> = {
+  pages: PageFanTransition,
+};
 
 const FLOAT_ITEMS: FloatItemConfig[] = [
   {
@@ -53,7 +61,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'resume',
     label: 'Resume',
     content: ResumeDocument,
-    modal: { title: 'Resume', content: () => <p>Resume coming soon.</p> },
+    modal: { title: 'Resume', content: ResumePdfViewer, openAnimation: 'pages' },
     freezeOnHover: true,
     // 140 × 334/260 = 180px desktop; 95 × 334/260 + 16px padding = 138px mobile
     heights: { desktop: 180, mobile: 138 },
@@ -130,11 +138,6 @@ const CHAOS_VALUES: ControlValues = {
   glowCycle: 5,
 };
 
-interface ActiveModal {
-  key: string;
-  origin: ModalOrigin;
-}
-
 const MOBILE_BREAKPOINT = 768;
 const STACK_GAP_DESKTOP = 90;
 const STACK_GAP_MOBILE = 40;
@@ -178,7 +181,8 @@ function App() {
   const [chaosActive, setChaosActive] = useState(false);
   const [controlValues, setControlValues] =
     useState<ControlValues>(CALM_VALUES);
-  const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
+  const { revealing, activeModal, startReveal, finishReveal, closeModal } =
+    useRevealOrchestration();
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
   const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
     computeStackPositions(FLOAT_ITEMS),
@@ -202,15 +206,18 @@ function App() {
     setControlValues((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleItemClick = useCallback((key: string, origin: ModalOrigin) => {
-    setFrozenKey(key);
-    setActiveModal({ key, origin });
-  }, []);
+  const handleItemClick = useCallback(
+    (key: string, rect: FloatItemOrigin) => {
+      setFrozenKey(key);
+      startReveal(key, rect);
+    },
+    [startReveal],
+  );
 
   const handleModalClose = useCallback(() => {
     setFrozenKey(null);
-    setActiveModal(null);
-  }, []);
+    closeModal();
+  }, [closeModal]);
 
   const handleActivateChaos = useCallback(() => {
     setChaosActive(true);
@@ -235,6 +242,12 @@ function App() {
   const activeConfig = activeModal
     ? FLOAT_ITEMS.find((item) => item.key === activeModal.key)
     : null;
+  const revealingConfig = revealing
+    ? FLOAT_ITEMS.find((item) => item.key === revealing.key)
+    : null;
+  const RevealTransitionComponent = revealingConfig?.modal
+    ? REVEAL_TRANSITIONS[revealingConfig.modal.openAnimation]
+    : undefined;
 
   return (
     <ErrorBoundary>
@@ -283,6 +296,10 @@ function App() {
           onMaxPower={handleMaxPower}
         />
       </div>
+
+      {revealing && RevealTransitionComponent && (
+        <RevealTransitionComponent origin={revealing.rect} onDone={finishReveal} />
+      )}
 
       {activeModal && activeConfig?.modal && (
         <Modal
