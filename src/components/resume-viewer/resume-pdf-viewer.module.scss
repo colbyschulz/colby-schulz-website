@@ -1,0 +1,29 @@
+@use '@/styles/tokens' as *;
+
+.viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.page {
+  max-width: 100%;
+  box-shadow: $glow-default;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.error,
+.loading {
+  color: $text-muted;
+  font-size: $text-md;
+}
+
+.download {
+  color: $text-primary;
+  font-size: $text-sm;
+  letter-spacing: $tracking-wide;
+  text-decoration: underline;
+  align-self: center;
+}
