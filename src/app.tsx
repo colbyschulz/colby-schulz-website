@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FloatProvider } from './components/float/float-provider';
 import type { FloatProviderHandle } from './components/float/float-types';
 import { FloatItem } from './components/float/float-item';
@@ -15,7 +15,6 @@ import type { OpenAnimation, RevealTransitionProps } from './components/reveal/r
 import { PageFanTransition } from './components/reveal/page-fan-transition';
 import { EnvelopeTransition } from './components/reveal/envelope-transition';
 import { CardFlipTransition } from './components/reveal/card-flip-transition';
-import { ResumePdfViewer } from './components/resume-viewer/resume-pdf-viewer';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -25,6 +24,15 @@ import type {
 import type { ComponentType } from 'react';
 import type { FloatItemOrigin, Vec2 } from './components/float/float-types.ts';
 import styles from './app.module.scss';
+
+// Lazy-loaded so react-pdf/pdfjs-dist ship in a separate chunk, fetched only
+// when a visitor actually opens the Resume modal, instead of in the main
+// entry bundle every visitor downloads.
+const ResumePdfViewer = lazy(() =>
+  import('./components/resume-viewer/resume-pdf-viewer').then((m) => ({
+    default: m.ResumePdfViewer,
+  })),
+);
 
 export interface FloatItemContentProps {
   label: string;
@@ -312,7 +320,9 @@ function App() {
           title={activeConfig.modal.title}
           origin={activeModal.origin}
         >
-          <activeConfig.modal.content />
+          <Suspense fallback={<p>Loading…</p>}>
+            <activeConfig.modal.content />
+          </Suspense>
         </Modal>
       )}
 
