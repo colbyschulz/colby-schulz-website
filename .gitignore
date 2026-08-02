@@ -27,3 +27,4 @@ dist-ssr
 .env*.local
 docs
 .worktrees
+.superpowers/
