@@ -775,11 +775,17 @@ npm install react-pdf@^10.4.1
 Create `src/components/resume-viewer/__tests__/resume-pdf-viewer.test.tsx`:
 
 ```tsx
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { ResumePdfViewer } from '../resume-pdf-viewer';
+
+// vitest.config.ts doesn't set test.globals, so @testing-library/react's
+// auto-cleanup (which detects a global `afterEach`) never registers —
+// without this, leftover nodes from earlier renders make getByRole below
+// match more than one element.
+afterEach(() => cleanup());
 
 vi.mock('react-pdf', () => ({
   pdfjs: { GlobalWorkerOptions: {} as Record<string, unknown> },
