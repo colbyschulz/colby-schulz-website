@@ -265,7 +265,7 @@ function App() {
           } as React.CSSProperties
         }
       >
-        <FloatProvider ref={floatProviderRef} speed={controlValues.speed}>
+        <FloatProvider ref={floatProviderRef} speed={controlValues.speed} paused={!!activeModal}>
           {FLOAT_ITEMS.map((item, i) => (
             <FloatItem
               key={item.key}

@@ -1,13 +1,11 @@
 @use '@/styles/tokens' as *;
-@use '@/styles/breakpoints' as *;
 
 .canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: $z-grain;
-
-  @include mobile {
-    opacity: 0.6;
-  }
+  background-repeat: repeat;
+  background-size: 128px 128px; // keep in sync with TILE_SIZE in grain-overlay.tsx
+  image-rendering: pixelated;
 }

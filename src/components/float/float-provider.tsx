@@ -3,9 +3,10 @@ import { FloatEngine } from './float-engine.ts';
 import { FloatContext } from './float-context.ts';
 import type { FloatProviderHandle, FloatProviderProps, Size, Vec2 } from './float-types.ts';
 
-export const FloatProvider = forwardRef<FloatProviderHandle, FloatProviderProps>(function FloatProvider({ speed, children }, ref) {
+export const FloatProvider = forwardRef<FloatProviderHandle, FloatProviderProps>(function FloatProvider({ speed, paused = false, children }, ref) {
   const engineRef = useRef<FloatEngine | null>(null);
   const animRef = useRef<number>(0);
+  const pausedRef = useRef(paused);
 
   if (engineRef.current == null) {
     engineRef.current = new FloatEngine(
@@ -19,6 +20,10 @@ export const FloatProvider = forwardRef<FloatProviderHandle, FloatProviderProps>
   useEffect(() => {
     engineRef.current?.setSpeed(speed);
   }, [speed]);
+
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   // Sync viewport on resize
   useEffect(() => {
@@ -35,12 +40,14 @@ export const FloatProvider = forwardRef<FloatProviderHandle, FloatProviderProps>
       const engine = engineRef.current;
       if (!engine) return;
 
-      const positions = engine.tick();
+      if (!pausedRef.current) {
+        const positions = engine.tick();
 
-      for (const [id, pos] of positions) {
-        const item = engine.getItem(id);
-        if (item?.element) {
-          item.element.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+        for (const [id, pos] of positions) {
+          const item = engine.getItem(id);
+          if (item?.element) {
+            item.element.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+          }
         }
       }
 

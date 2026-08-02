@@ -43,6 +43,10 @@ export interface FloatContextValue {
 
 export interface FloatProviderProps {
   speed: number;
+  // Halts the whole tick loop (all items, not just the clicked one) — used
+  // while a modal is open so nothing keeps moving behind its blurred
+  // backdrop, which is otherwise expensive to keep recompositing.
+  paused?: boolean;
   children: ReactNode;
 }
 
