@@ -42,6 +42,7 @@ interface FloatItemConfig {
   modal?: {
     title: string;
     content: ComponentType;
+    buttonText: string;
   };
   // Pixel heights per breakpoint: SVG aspect ratio × CSS width + touch padding where applicable.
   // Must be updated if icon CSS widths change.
@@ -53,7 +54,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'name',
     label: 'Colby Schulz',
     content: NameCard,
-    modal: { title: 'About', content: () => <p>About content coming soon.</p> },
+    modal: { title: 'About', buttonText: "got it", content: () => <p>About content coming soon.</p> },
     freezeOnHover: true,
     // 220 × 188/368 = 112px desktop; 150 × 188/368 + 16px padding = 93px mobile
     heights: { desktop: 112, mobile: 93 },
@@ -62,7 +63,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'resume',
     label: 'Resume',
     content: ResumeDocument,
-    modal: { title: 'Resume', content: ResumePdfViewer },
+    modal: { title: 'Resume', buttonText: "looks good", content: ResumePdfViewer },
     freezeOnHover: true,
     // 140 × 334/260 = 180px desktop; 95 × 334/260 + 16px padding = 138px mobile
     heights: { desktop: 180, mobile: 138 },
@@ -71,7 +72,7 @@ const FLOAT_ITEMS: FloatItemConfig[] = [
     key: 'contact',
     label: 'Contact',
     content: ContactEnvelope,
-    modal: { title: 'Contact', content: () => <p>Contact coming soon.</p> },
+    modal: { title: 'Contact', buttonText: "talk soon", content: () => <p>Contact coming soon.</p> },
     freezeOnHover: true,
     // 220 × 198/358 = 122px desktop; 150 × 198/358 + 16px padding = 99px mobile
     heights: { desktop: 122, mobile: 99 },
@@ -297,8 +298,9 @@ function App() {
           onClose={handleModalClose}
           title={activeConfig.modal.title}
           origin={activeModal.origin}
+          buttonText={activeConfig.modal.buttonText}
         >
-          <Suspense fallback={<p>Loading…</p>}>
+          <Suspense fallback={null}>
             <activeConfig.modal.content />
           </Suspense>
         </Modal>
