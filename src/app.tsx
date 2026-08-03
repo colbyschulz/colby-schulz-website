@@ -20,12 +20,21 @@ import type {
   ControlValues,
 } from './components/chaos-panel/chaos-panel.types';
 
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import type { FloatItemOrigin, Vec2 } from './components/float/float-types.ts';
 import styles from './app.module.scss';
 
 export interface FloatItemContentProps {
   label: string;
+}
+
+// Optional escape hatch for modal content that needs controls living in
+// Modal's header (outside the scrolling body) rather than inline — e.g.
+// Resume's zoom buttons, which can't be inline without either scrolling out
+// of reach or overlapping the document as a sticky element. Modal itself
+// stays agnostic to what's reported; unused by content that doesn't need it.
+export interface ModalContentProps {
+  onHeaderActionsChange?: (node: ReactNode) => void;
 }
 
 interface FloatItemConfig {
@@ -35,7 +44,7 @@ interface FloatItemConfig {
   freezeOnHover?: boolean;
   modal?: {
     title: string;
-    content: ComponentType;
+    content: ComponentType<ModalContentProps>;
     buttonText: string;
   };
   // Bypasses the modal entirely — clicking navigates straight to this URL (e.g. a mailto: link).
@@ -182,6 +191,7 @@ function App() {
   const { activeModal, openModal, closeModal } = useRevealOrchestration();
   const [frozenKey, setFrozenKey] = useState<string | null>(null);
   const [toast, setToast] = useState({ open: false, message: '' });
+  const [modalHeaderActions, setModalHeaderActions] = useState<ReactNode>(null);
   const [stackPositions, setStackPositions] = useState<Vec2[]>(() =>
     computeStackPositions(FLOAT_ITEMS),
   );
@@ -207,6 +217,7 @@ function App() {
   const handleItemClick = useCallback(
     (key: string, rect: FloatItemOrigin) => {
       setFrozenKey(key);
+      setModalHeaderActions(null); // clear the previous modal's header actions, if any
       openModal(key, rect);
     },
     [openModal],
@@ -227,6 +238,7 @@ function App() {
 
   const handleModalClose = useCallback(() => {
     setFrozenKey(null);
+    setModalHeaderActions(null);
     closeModal();
   }, [closeModal]);
 
@@ -311,8 +323,9 @@ function App() {
           title={activeConfig.modal.title}
           origin={activeModal.origin}
           buttonText={activeConfig.modal.buttonText}
+          headerActions={modalHeaderActions}
         >
-          <activeConfig.modal.content />
+          <activeConfig.modal.content onHeaderActionsChange={setModalHeaderActions} />
         </Modal>
       )}
 

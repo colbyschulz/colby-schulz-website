@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import type { ModalContentProps } from '@/app';
 import styles from './resume-pdf-viewer.module.scss';
 
 // Lazy-loaded so react-pdf/pdfjs-dist ship in a separate chunk, fetched only
@@ -43,9 +44,13 @@ function computePageWidth() {
   return Math.round(Math.min(target, window.innerWidth * VIEWPORT_WIDTH_CEILING_RATIO));
 }
 
-interface ResumeStageProps {
+interface ResumeStageProps extends ModalContentProps {
   file?: string;
 }
+
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 2;
+const ZOOM_STEP = 0.25;
 
 // This component is imported eagerly (not lazy) from app.tsx, specifically
 // so it's available on the very first render with zero async dependency —
@@ -61,7 +66,7 @@ interface ResumeStageProps {
 // is correctly sized from frame one — before the lazy engine below has even
 // started fetching. The engine mounting inside an already-correctly-sized
 // box is what makes an empty Suspense fallback safe here.
-export function ResumeStage({ file = DEFAULT_FILE }: ResumeStageProps) {
+export function ResumeStage({ file = DEFAULT_FILE, onHeaderActionsChange }: ResumeStageProps) {
   const [pageWidth, setPageWidth] = useState(computePageWidth);
   // True once the first page has actually painted (the engine's onReady,
   // driven by react-pdf's onRenderSuccess) — painting is what makes it
@@ -69,12 +74,57 @@ export function ResumeStage({ file = DEFAULT_FILE }: ResumeStageProps) {
   // content appearing rather than a page popping into a blank spot.
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     const recompute = () => setPageWidth(computePageWidth());
     window.addEventListener('resize', recompute);
     return () => window.removeEventListener('resize', recompute);
   }, []);
+
+  const zoomControls = (
+    <div className={styles.zoomControls}>
+      <button
+        type="button"
+        className={styles.zoomButton}
+        onClick={() => setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)))}
+        disabled={!ready || zoom <= ZOOM_MIN}
+        aria-label="Zoom out"
+      >
+        −
+      </button>
+      <button
+        type="button"
+        className={styles.zoomLabel}
+        onClick={() => setZoom(1)}
+        disabled={!ready}
+        aria-label="Reset zoom"
+      >
+        {Math.round(zoom * 100)}%
+      </button>
+      <button
+        type="button"
+        className={styles.zoomButton}
+        onClick={() => setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)))}
+        disabled={!ready || zoom >= ZOOM_MAX}
+        aria-label="Zoom in"
+      >
+        +
+      </button>
+    </div>
+  );
+
+  // Reported into Modal's header (see ModalContentProps) rather than
+  // rendered inline — a sticky element inside the scrolling body either
+  // shows text through it or clips it awkwardly at the edges, since the
+  // controls float over a document that's actively scrolling underneath.
+  useEffect(() => {
+    onHeaderActionsChange?.(loadError ? null : zoomControls);
+    return () => onHeaderActionsChange?.(null);
+    // zoomControls is a fresh element every render (by design, it closes
+    // over zoom/ready) — depend on the primitives that actually change it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoom, ready, loadError, onHeaderActionsChange]);
 
   if (loadError) {
     return <p className={styles.error}>Couldn&apos;t load the resume PDF.</p>;
@@ -84,27 +134,43 @@ export function ResumeStage({ file = DEFAULT_FILE }: ResumeStageProps) {
   // until ready, then relaxes to auto so the rest of the pages can stack
   // normally for continuous scroll.
   const stageHeight = Math.round(pageWidth / ASSUMED_ASPECT_RATIO);
+  // Zoom is locked to 1 until ready (buttons below are disabled), so this
+  // always matches pageWidth during the reserved-size loading phase — no
+  // jump risk from the two diverging.
+  const displayWidth = Math.round(pageWidth * zoom);
 
   return (
     <div className={styles.viewer}>
-      <div
-        data-testid="resume-stage"
-        className={styles.stage}
-        style={{ width: pageWidth, height: ready ? undefined : stageHeight }}
-      >
-        <Suspense fallback={null}>
-          <ResumePdfEngine
-            file={file}
-            pageWidth={pageWidth}
-            onReady={() => setReady(true)}
-            onError={() => setLoadError(true)}
-          />
-        </Suspense>
+      <div className={styles.scrollArea}>
         <div
-          data-testid="resume-skeleton"
-          className={`${styles.skeleton}${ready ? ` ${styles.hidden}` : ''}`}
-        />
+          data-testid="resume-stage"
+          className={styles.stage}
+          style={{
+            width: displayWidth,
+            height: ready ? undefined : stageHeight,
+            // The stage is normally capped to its container's width (see
+            // .stage in the stylesheet) so an over-estimated computePageWidth
+            // never overflows the modal. Zooming in is an intentional
+            // request to exceed that fit, so it lifts the cap and relies on
+            // .scrollArea for horizontal scrolling instead.
+            maxWidth: zoom > 1 ? 'none' : undefined,
+          }}
+        >
+          <Suspense fallback={null}>
+            <ResumePdfEngine
+              file={file}
+              pageWidth={displayWidth}
+              onReady={() => setReady(true)}
+              onError={() => setLoadError(true)}
+            />
+          </Suspense>
+          <div
+            data-testid="resume-skeleton"
+            className={`${styles.skeleton}${ready ? ` ${styles.hidden}` : ''}`}
+          />
+        </div>
       </div>
+
       <a href={file} download className={styles.download}>
         Download PDF
       </a>

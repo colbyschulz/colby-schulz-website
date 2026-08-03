@@ -70,12 +70,23 @@
   }
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $modal-border-subtle;
+}
+
 .title {
   font-size: $text-lg;
   font-weight: $weight-light;
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid $modal-border-subtle;
   margin: 0;
+}
+
+.headerActions {
+  flex-shrink: 0;
 }
 
 .body {
