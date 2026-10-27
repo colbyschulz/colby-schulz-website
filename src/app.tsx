@@ -14,6 +14,7 @@ import { Modal } from './components/modal/modal';
 import { ResumeStage } from './components/resume-viewer/resume-stage';
 import { AboutContent } from './components/about-content/about-content';
 import { Toast } from './components/toast/toast';
+import { Analytics } from '@vercel/analytics/react';
 import { useRevealOrchestration } from './hooks/use-reveal-orchestration.ts';
 import type {
   Control,
@@ -336,6 +337,7 @@ function App() {
       />
 
       <GrainOverlay opacity={controlValues.grain} />
+      <Analytics />
     </ErrorBoundary>
   );
 }
